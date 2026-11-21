@@ -2,7 +2,7 @@
 section DocuSignPowerBI;
 
 // DocuSign Integration Key for a public-client Authorization Code + PKCE application. Preserve this value.
-ClientId = "5869c14c-ebf6-465d-b940-2ad76d259d56";
+ClientId = "226dd43b-4b8e-488a-9ba8-ac205c100833";
 
 RedirectUri = "https://oauth.powerbi.com/views/oauthredirect.html";
 Scope = "signature extended";
