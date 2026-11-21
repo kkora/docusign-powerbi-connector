@@ -14,9 +14,9 @@ r2 = Table.SelectRows(recipients, each [EnvelopeId] = "env-happy-1" and [Recipie
 shared DocuSignPowerBI.Test.Integration.Happy = PQTest(
     [Owner = "automation", Traits = [Category = "Integration"]],
     {
-        // PBI-04: the Navigator exposes exactly three tables, named exactly as required.
-        Fact("PBI-04 Navigator exposes exactly three tables", 3, Table.RowCount(nav)),
-        Fact("PBI-04 Navigator table names are exactly Envelopes/Recipients/Envelope Status", {"Envelope Status", "Envelopes", "Recipients"}, List.Sort(Table.Column(nav, "Name"))),
+        // PBI-04: the Navigator exposes exactly the eight required tables.
+        Fact("PBI-04 Navigator exposes exactly eight tables", 8, Table.RowCount(nav)),
+        Fact("PBI-04 Navigator table names are exactly the eight required tables", List.Sort({"Envelopes", "Recipients", "Envelope Status", "Envelope Custom Fields", "Envelope Audit Events", "Templates", "Envelope Documents", "Accounts"}), List.Sort(Table.Column(nav, "Name"))),
 
         // API-01 / API-02: account discovery (/oauth/userinfo) drove the account-specific API base URI and account id used for every downstream call.
         Fact("API-01/02 AccountId from account discovery is stamped onto every envelope row", "ACCT-1", e1[AccountId]),

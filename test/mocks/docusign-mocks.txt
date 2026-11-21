@@ -6,7 +6,8 @@ Content-Type: application/json
 {
   "sub": "11111111-1111-1111-1111-111111111111",
   "accounts": [
-    { "account_id": "ACCT-1", "is_default": true, "base_uri": "https://demo.docusign.net", "account_name": "Test Account" }
+    { "account_id": "ACCT-1", "is_default": true, "base_uri": "https://demo.docusign.net", "account_name": "Test Account" },
+    { "account_id": "ACCT-2", "is_default": false, "base_uri": "https://demo.docusign.net", "account_name": "Secondary Test Account" }
   ]
 }
 
@@ -239,3 +240,125 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {"error": "invalid_grant", "error_description": "The authorization code or refresh token is invalid or has expired."}
+
+------------------------------------------------------------------
+
+GET https://demo.docusign.net/restapi/v2.1/accounts/ACCT-1/envelopes?from_date=2024-10-01&start_position=0&count=100 HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "resultSetSize": "1",
+  "totalSetSize": "1",
+  "startPosition": "0",
+  "endPosition": "0",
+  "envelopes": [
+    { "envelopeId": "env-new-1", "emailSubject": "New tables test", "status": "sent", "sentDateTime": "2024-10-01T08:00:00.0000000Z" }
+  ]
+}
+
+------------------------------------------------------------------
+
+GET https://demo.docusign.net/restapi/v2.1/accounts/ACCT-1/envelopes/env-new-1/recipients HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "signers": [
+    { "recipientId": "1", "name": "New Table Signer", "email": "signer@example.com", "routingOrder": "1", "status": "sent", "roleName": "signer1" }
+  ]
+}
+
+------------------------------------------------------------------
+
+GET https://demo.docusign.net/restapi/v2.1/accounts/ACCT-1/envelopes/env-new-1/custom_fields HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "textCustomFields": [
+    { "fieldId": "1", "name": "Department", "value": "Sales", "show": "true", "required": "false" }
+  ],
+  "listCustomFields": [
+    { "fieldId": "2", "name": "Region", "value": "AMER", "show": "true", "required": "true", "listItems": ["AMER", "EMEA", "APAC"] }
+  ]
+}
+
+------------------------------------------------------------------
+
+GET https://demo.docusign.net/restapi/v2.1/accounts/ACCT-1/envelopes/env-new-1/audit_events HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "auditEvents": [
+    {
+      "eventFields": [
+        { "name": "logTime", "value": "2024-10-01T08:00:00.0000000Z" },
+        { "name": "Action", "value": "Sent" },
+        { "name": "UserName", "value": "Jane Sender" },
+        { "name": "Email", "value": "jane@example.com" },
+        { "name": "IP Address", "value": "10.0.0.5" }
+      ]
+    },
+    {
+      "eventFields": [
+        { "name": "logTime", "value": "2024-10-01T08:05:00.0000000Z" },
+        { "name": "Action", "value": "Delivered" },
+        { "name": "UserName", "value": "New Table Signer" }
+      ]
+    }
+  ]
+}
+
+------------------------------------------------------------------
+
+GET https://demo.docusign.net/restapi/v2.1/accounts/ACCT-1/envelopes/env-new-1/documents HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "envelopeDocuments": [
+    { "documentId": "1", "name": "Agreement.pdf", "type": "content", "order": "1", "pages": [ { "pageId": "1" }, { "pageId": "2" } ] },
+    { "documentId": "2", "name": "Summary.pdf", "type": "summary", "order": "2", "pages": [ { "pageId": "1" } ] }
+  ]
+}
+
+------------------------------------------------------------------
+
+GET https://demo.docusign.net/restapi/v2.1/accounts/ACCT-1/templates?start_position=0&count=100 HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "resultSetSize": "1",
+  "totalSetSize": "1",
+  "startPosition": "0",
+  "endPosition": "0",
+  "envelopeTemplates": [
+    { "templateId": "tmpl-1", "name": "Standard NDA", "description": "Mutual NDA template", "created": "2024-01-01T00:00:00.0000000Z", "lastModifiedDateTime": "2024-06-01T00:00:00.0000000Z", "owner": { "userName": "Account Owner" }, "shared": true }
+  ]
+}
+
+------------------------------------------------------------------
+
+GET https://demo.docusign.net/restapi/v2.1/accounts/ACCT-2/envelopes?from_date=2024-10-01&start_position=0&count=100 HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "resultSetSize": "1",
+  "totalSetSize": "1",
+  "startPosition": "0",
+  "endPosition": "0",
+  "envelopes": [
+    { "envelopeId": "env-acct2-1", "emailSubject": "Account 2 envelope", "status": "sent", "sentDateTime": "2024-10-01T08:00:00.0000000Z" }
+  ]
+}

@@ -1,8 +1,19 @@
 # DocuSign Power BI Connector
 
-Custom Power Query connector for DocuSign eSignature (REST API v2.1), using OAuth 2.0 Authorization Code with PKCE (S256). Exposes exactly three tables: **Envelopes**, **Recipients**, **Envelope Status**.
+Custom Power Query connector for DocuSign eSignature (REST API v2.1), using OAuth 2.0 Authorization Code with PKCE (S256). Exposes exactly eight tables: **Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Accounts**. All read-only — the connector never creates, sends, signs, or modifies anything in DocuSign.
 
-Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 91/91 automated Facts pass against the compiled `.mez`; live Power BI Desktop/gateway/Service steps are documented below but not executed by this repo (they require interactive login and provisioned infrastructure).
+Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 138/138 automated Facts pass against the compiled `.mez`; live Power BI Desktop/gateway/Service steps are documented below but not executed by this repo (they require interactive login and provisioned infrastructure).
+
+## Connecting
+
+`DocuSignPowerBI.Contents(environment, optional fromDate, optional toDate, optional accountId)`:
+
+- `environment` (required): `"Demo"` or `"Production"`.
+- `fromDate` (optional, `YYYY-MM-DD`): defaults to 30 days before today if omitted.
+- `toDate` (optional, `YYYY-MM-DD`): defaults to no upper bound (through now) if omitted. Must not be before `fromDate`.
+- `accountId` (optional): selects a specific DocuSign account when your login has access to more than one. Omit to use your default account. See the **Accounts** table to find available account ids.
+
+All three optional parameters are excluded from the connector's Data Source Path, so changing them does not create a new credential entry or break scheduled refresh (see PBI-06 in TEST-RESULTS.md).
 
 ## Prerequisites
 
@@ -28,7 +39,7 @@ No real DocuSign credentials are used. Unit tests are pure M (no network); integ
 # Pure unit tests (PKCE, OAuth helpers, data transforms, null-safety)
 PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\unit -p
 
-# HTTP-mocked integration tests (pagination, errors, OAuth token exchange, full Contents() flow)
+# HTTP-mocked integration tests (pagination, errors, OAuth token exchange, new tables, multi-account, full Contents() flow)
 PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration -hm test\mocks\docusign-mocks.txt -sf test\settings.json -p -tf "!06_unauthorized.query.pq"
 
 # 401 -> refresh -> retry evidence (expected to fail with AccessUnauthorized - see TEST-RESULTS.md)
@@ -44,9 +55,9 @@ PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration\
 2. Copy `DocuSignPowerBI.mez` to `%USERPROFILE%\Documents\Power BI Desktop\Custom Connectors\` (create the folder if it doesn't exist).
 3. In Power BI Desktop: **File → Options and settings → Options → Security → Data Extensions** → select **"Allow any extension to load without validation or warning"** (required for an unsigned connector in development).
 4. Restart Power BI Desktop.
-5. **Get Data → More... → Online Services → DocuSign eSignature**, then enter `Demo` (and optionally a `fromDate` in `YYYY-MM-DD` form).
+5. **Get Data → More... → Online Services → DocuSign eSignature**, then enter `Demo` (and optionally `fromDate`/`toDate`/`accountId` — see "Connecting" above).
 6. Sign in with a DocuSign Demo account when prompted (OAuth browser dialog).
-7. In Navigator, select **Envelopes**, **Recipients**, and/or **Envelope Status** and load.
+7. In Navigator, select any of the eight tables (**Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Accounts**) and load. Only the tables you actually select trigger their corresponding API calls (Navigator data is lazy).
 
 ## Power BI Service / on-premises gateway installation
 
@@ -66,4 +77,4 @@ See "Known limitations" in [TEST-RESULTS.md](TEST-RESULTS.md) — in short: the 
 
 ## Notes
 
-This uses the eSignature API only; no envelope documents are downloaded. Recipients are requested individually per envelope, which may be slow or encounter rate limits for accounts with many envelopes — HTTP 429 is retried with bounded exponential backoff (see `MaxRetryAttempts`/`BaseRetryDelaySeconds`/`MaxRetryDelaySeconds` in `DocuSignPowerBI.pq`).
+This uses the eSignature API only; no envelope document *content* is ever downloaded, only metadata (name/type/page count). Recipients, Custom Fields, Audit Events, and Envelope Documents are each requested individually per envelope — that's up to 4 extra API calls per envelope on top of the envelope list itself, which may be slow or encounter rate limits for accounts with many envelopes. HTTP 429 is retried with bounded exponential backoff (see `MaxRetryAttempts`/`BaseRetryDelaySeconds`/`MaxRetryDelaySeconds` in `DocuSignPowerBI.pq`). Navigator tables are lazy, so a report that only loads, say, Envelopes and Envelope Status never triggers the Recipients/Custom Fields/Audit Events/Documents calls at all.

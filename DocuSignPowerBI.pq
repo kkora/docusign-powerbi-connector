@@ -1,4 +1,4 @@
-[Version = "1.1.0"]
+[Version = "1.2.0"]
 section DocuSignPowerBI;
 
 // DocuSign Integration Key for a public-client Authorization Code + PKCE application. Preserve this value.
@@ -12,17 +12,53 @@ MaxRetryAttempts = 3;
 BaseRetryDelaySeconds = 1;
 MaxRetryDelaySeconds = 10;
 
+// ===== Row types (unchanged tables keep their exact original shape for backward compatibility) =====
+
 EnvelopesRowType = type table [
     AccountId = nullable text, EnvelopeId = nullable text, EmailSubject = nullable text,
     Status = nullable text, CreatedDateTime = nullable datetime, SentDateTime = nullable datetime,
     CompletedDateTime = nullable datetime, VoidedDateTime = nullable datetime, LastModifiedDateTime = nullable datetime
 ];
 
+// Extended for F04: adds AccountId, RecipientRole, SentDateTime, DeclinedDateTime, DeclineReason,
+// AuthenticationMethod, CompletionHours alongside every original column. Additive only - existing
+// columns keep their names/types, so existing reports referencing them are unaffected.
 RecipientsRowType = type table [
-    EnvelopeId = nullable text, RecipientId = nullable text, RecipientName = nullable text,
-    RecipientEmail = nullable text, RecipientType = nullable text, RoutingOrder = nullable number,
-    RecipientStatus = nullable text, SignedDateTime = nullable datetime, DeliveredDateTime = nullable datetime
+    AccountId = nullable text, EnvelopeId = nullable text, RecipientId = nullable text, RecipientName = nullable text,
+    RecipientEmail = nullable text, RecipientType = nullable text, RecipientRole = nullable text, RoutingOrder = nullable number,
+    RecipientStatus = nullable text, SentDateTime = nullable datetime, SignedDateTime = nullable datetime, DeliveredDateTime = nullable datetime,
+    DeclinedDateTime = nullable datetime, DeclineReason = nullable text, AuthenticationMethod = nullable text, CompletionHours = nullable number
 ];
+
+CustomFieldsRowType = type table [
+    AccountId = nullable text, EnvelopeId = nullable text, FieldName = nullable text, FieldValue = nullable text,
+    FieldType = nullable text, Show = nullable logical, Required = nullable logical
+];
+
+// EventDateTime kept as datetimezone (not plain datetime) since this is a new table with no
+// backward-compatibility constraint, and audit trails benefit from preserving the original offset
+// rather than collapsing every signer's local time to a naive value (see F09).
+AuditEventsRowType = type table [
+    AccountId = nullable text, EnvelopeId = nullable text, EventDateTime = nullable datetimezone, EventType = nullable text,
+    EventDescription = nullable text, UserName = nullable text, UserEmail = nullable text, IPAddress = nullable text,
+    Action = nullable text, Result = nullable text
+];
+
+// NOTE: DocuSign's GET /templates response does not document a "status" field at all (confirmed
+// against the current API reference). Status is still exposed per spec but will always be null
+// against a real tenant unless DocuSign adds one - this is a documented limitation, not a bug.
+TemplatesRowType = type table [
+    AccountId = nullable text, TemplateId = nullable text, TemplateName = nullable text, Description = nullable text,
+    CreatedDateTime = nullable datetime, LastModifiedDateTime = nullable datetime, OwnerName = nullable text,
+    Shared = nullable logical, Status = nullable text
+];
+
+DocumentsRowType = type table [
+    AccountId = nullable text, EnvelopeId = nullable text, DocumentId = nullable text, DocumentName = nullable text,
+    DocumentType = nullable text, Order = nullable number, Pages = nullable number
+];
+
+AccountsRowType = type table [AccountId = nullable text, AccountName = nullable text, IsDefault = nullable logical, Environment = nullable text];
 
 RecipientBuckets = {"signers", "agents", "editors", "intermediaries", "carbonCopies", "certifiedDeliveries", "inPersonSigners", "seals", "witnesses", "notaries"};
 
@@ -139,32 +175,62 @@ DocuSignPowerBI.Icons = [
 ];
 
 // ===== Main entry point =====
-
+//
+// fromDate/toDate/accountId are all `optional`, so none of them factor into the Data Source Path
+// (only required parameters do) - the connection identity stays `{"environment": ...}` regardless
+// of which date range or account a report requests, which is what keeps credentials/gateway config
+// stable across different reports (F05/F10).
 [DataSource.Kind = "DocuSignPowerBI", Publish = "DocuSignPowerBI.Publish"]
-shared DocuSignPowerBI.Contents = (environment as text, optional fromDate as nullable text) as table =>
+shared DocuSignPowerBI.Contents = (environment as text, optional fromDate as nullable text, optional toDate as nullable text, optional accountId as nullable text) as table =>
     let
         _validEnvironment =
             if environment <> "Demo" and environment <> "Production" then
                 error Error.Record("DocuSign.Config", "Unsupported environment '" & environment & "'. Use Demo or Production.", environment)
             else environment,
         _fromDate = DocuSignPowerBI.ResolveFromDate(fromDate),
+        _toDate = DocuSignPowerBI.ResolveToDate(toDate),
+        _dateRangeChecked =
+            if _toDate <> null and Date.FromText(_fromDate) > Date.FromText(_toDate) then
+                error Error.Record("DocuSign.Config", "fromDate must not be after toDate.", [FromDate = _fromDate, ToDate = _toDate])
+            else true,
         token = Extension.CurrentCredential()[access_token],
         userInfo = DocuSignPowerBI.GetUserInfo(_validEnvironment, token),
         accounts = Record.FieldOrDefault(userInfo, "accounts", {}),
         _accountsChecked = if List.IsEmpty(accounts) then error Error.Record("DocuSign.Account", "The authenticated DocuSign user has no accessible accounts.", null) else accounts,
-        account = List.First(List.Select(_accountsChecked, each Record.FieldOrDefault(_, "is_default", false) = true), _accountsChecked{0}),
-        accountId = Record.FieldOrDefault(account, "account_id", null),
+        _requestedAccountId = if accountId = null or Text.Trim(accountId) = "" then null else accountId,
+        _matchedAccounts = if _requestedAccountId = null then {} else List.Select(_accountsChecked, each Text.From(Record.FieldOrDefault(_, "account_id", "")) = _requestedAccountId),
+        _accountSelectionChecked =
+            if _requestedAccountId <> null and List.IsEmpty(_matchedAccounts) then
+                error Error.Record("DocuSign.Account", "The requested accountId '" & _requestedAccountId & "' is not accessible to the authenticated user.", _requestedAccountId)
+            else true,
+        account =
+            if _accountSelectionChecked and _requestedAccountId <> null then _matchedAccounts{0}
+            else List.First(List.Select(_accountsChecked, each Record.FieldOrDefault(_, "is_default", false) = true), _accountsChecked{0}),
+        resolvedAccountId = Record.FieldOrDefault(account, "account_id", null),
         apiBase = Text.TrimEnd(Record.FieldOrDefault(account, "base_uri", ""), "/"),
-        rawEnvelopes = DocuSignPowerBI.GetEnvelopesRaw(apiBase, accountId, token, _fromDate),
-        envelopesTable = Table.Distinct(DocuSignPowerBI.BuildEnvelopesTable(rawEnvelopes, accountId), {"EnvelopeId"}),
-        recipientsTable = DocuSignPowerBI.BuildRecipientsTable(apiBase, accountId, token, envelopesTable),
+        rawEnvelopes = if _dateRangeChecked then DocuSignPowerBI.GetEnvelopesRaw(apiBase, resolvedAccountId, token, _fromDate, _toDate) else error Error.Record("DocuSign.Config", "Unreachable.", null),
+        // Table.Buffer: envelopesTable feeds five separate downstream builders below: materialize it
+        // once rather than risk the engine re-walking the fetch/parse chain per consumer (F08).
+        envelopesTable = Table.Buffer(Table.Distinct(DocuSignPowerBI.BuildEnvelopesTable(rawEnvelopes, resolvedAccountId), {"EnvelopeId"})),
+        recipientsTable = DocuSignPowerBI.BuildRecipientsTable(apiBase, resolvedAccountId, token, envelopesTable),
         statusTable = DocuSignPowerBI.BuildStatusTable(envelopesTable),
+        customFieldsTable = DocuSignPowerBI.BuildCustomFieldsTable(apiBase, resolvedAccountId, token, envelopesTable),
+        auditEventsTable = DocuSignPowerBI.BuildAuditEventsTable(apiBase, resolvedAccountId, token, envelopesTable),
+        rawTemplates = DocuSignPowerBI.GetTemplatesRaw(apiBase, resolvedAccountId, token),
+        templatesTable = DocuSignPowerBI.BuildTemplatesTable(rawTemplates, resolvedAccountId),
+        documentsTable = DocuSignPowerBI.BuildDocumentsTable(apiBase, resolvedAccountId, token, envelopesTable),
+        accountsTable = DocuSignPowerBI.BuildAccountsTable(_accountsChecked, _validEnvironment),
         objects = #table(
             {"Name", "Key", "Data", "ItemKind", "ItemName", "IsLeaf"},
             {
                 {"Envelopes", "Envelopes", envelopesTable, "Table", "Table", true},
                 {"Recipients", "Recipients", recipientsTable, "Table", "Table", true},
-                {"Envelope Status", "Envelope Status", statusTable, "Table", "Table", true}
+                {"Envelope Status", "Envelope Status", statusTable, "Table", "Table", true},
+                {"Envelope Custom Fields", "Envelope Custom Fields", customFieldsTable, "Table", "Table", true},
+                {"Envelope Audit Events", "Envelope Audit Events", auditEventsTable, "Table", "Table", true},
+                {"Templates", "Templates", templatesTable, "Table", "Table", true},
+                {"Envelope Documents", "Envelope Documents", documentsTable, "Table", "Table", true},
+                {"Accounts", "Accounts", accountsTable, "Table", "Table", true}
             }
         ),
         nav = Table.ToNavigationTable(objects, {"Key"}, "Name", "Data", "ItemKind", "ItemName", "IsLeaf")
@@ -175,6 +241,13 @@ shared DocuSignPowerBI.ResolveFromDate = (fromDate as nullable text) as text =>
         defaulted = if fromDate = null or Text.Trim(fromDate) = "" then Date.ToText(Date.AddDays(DateTime.Date(DateTime.LocalNow()), -30), "yyyy-MM-dd") else fromDate,
         validated = if (try Date.FromText(defaulted) otherwise null) = null then error Error.Record("DocuSign.Config", "fromDate must be in YYYY-MM-DD format.", defaulted) else defaulted
     in validated;
+
+// toDate has no default: null means "no upper bound", which DocuSign's envelopes endpoint
+// interprets as "through now" when to_date is simply omitted from the request.
+shared DocuSignPowerBI.ResolveToDate = (toDate as nullable text) as nullable text =>
+    if toDate = null or Text.Trim(toDate) = "" then null
+    else if (try Date.FromText(toDate) otherwise null) = null then error Error.Record("DocuSign.Config", "toDate must be in YYYY-MM-DD format.", toDate)
+    else toDate;
 
 // ===== HTTP plumbing: null-safe JSON, 401 (engine-refresh), 403, 429/5xx bounded retry =====
 
@@ -190,6 +263,15 @@ shared DocuSignPowerBI.SafeInt = (value as any) as number =>
 shared DocuSignPowerBI.SafeNumber = (value as any) as nullable number =>
     if value = null then null else try Number.FromText(Text.From(value)) otherwise null;
 
+// DocuSign returns several booleans (show/required/shared) as either a literal JSON boolean or a
+// "true"/"false" string depending on endpoint; handle both without erroring on either.
+shared DocuSignPowerBI.SafeBool = (value as any) as nullable logical =>
+    if value = null then null
+    else if value = true or value = false then value
+    else
+        let t = try Text.Lower(Text.From(value)) otherwise null
+        in if t = "true" then true else if t = "false" then false else null;
+
 shared DocuSignPowerBI.ToDateTime = (value as any) as nullable datetime =>
     if value = null then null
     else
@@ -200,6 +282,16 @@ shared DocuSignPowerBI.ToDateTime = (value as any) as nullable datetime =>
                 else
                     let zoned = try DateTimeZone.FromText(text) otherwise null
                     in if zoned <> null then DateTimeZone.RemoveZone(zoned) else (try DateTime.FromText(text) otherwise null)
+        in parsed;
+
+// Zone-preserving counterpart to ToDateTime, used only by new tables (Audit Events) where there is
+// no pre-existing naive-datetime column to stay compatible with (F09).
+shared DocuSignPowerBI.ToDateTimeZone = (value as any) as nullable datetimezone =>
+    if value = null then null
+    else
+        let
+            text = try Text.From(value) otherwise null,
+            parsed = if text = null or Text.Trim(text) = "" then null else (try DateTimeZone.FromText(text) otherwise null)
         in parsed;
 
 shared DocuSignPowerBI.StatusEquals = (status as nullable text, target as text) as logical =>
@@ -239,15 +331,17 @@ shared DocuSignPowerBI.HttpGetWithRetry = (base as text, path as text, token as 
 shared DocuSignPowerBI.GetUserInfo = (environment as text, token as text) as record =>
     DocuSignPowerBI.HttpGetWithRetry(DocuSignPowerBI.AuthHost(environment), "oauth/userinfo", token, null, 0);
 
-// ===== Envelopes: pagination via resultSetSize/totalSetSize/endPosition =====
+// ===== Envelopes: pagination via resultSetSize/totalSetSize/endPosition, optional to_date (F02) =====
 
-shared DocuSignPowerBI.GetEnvelopesRaw = (base as text, accountId as text, token as text, fromDate as text) as list =>
+shared DocuSignPowerBI.GetEnvelopesRaw = (base as text, accountId as text, token as text, fromDate as text, optional toDate as nullable text) as list =>
     let
         path = "restapi/v2.1/accounts/" & accountId & "/envelopes",
         pageSize = 100,
         FetchPage = (startPosition as number) as record =>
-            DocuSignPowerBI.HttpGetWithRetry(base, path, token,
-                [from_date = fromDate, start_position = Text.From(startPosition), count = Text.From(pageSize)], 0),
+            let
+                baseQuery = [from_date = fromDate, start_position = Text.From(startPosition), count = Text.From(pageSize)],
+                fullQuery = if toDate <> null then Record.Combine({baseQuery, [to_date = toDate]}) else baseQuery
+            in DocuSignPowerBI.HttpGetWithRetry(base, path, token, fullQuery, 0),
         pages = List.Generate(
             () => [response = FetchPage(0), hasMore = true],
             each [hasMore],
@@ -282,24 +376,38 @@ shared DocuSignPowerBI.BuildEnvelopesTable = (rawEnvelopes as list, accountId as
     in
         Table.FromRecords(records, EnvelopesRowType, MissingField.UseNull);
 
-// ===== Recipients: fan out per envelope, flatten every DocuSign recipient bucket =====
+// ===== Recipients: fan out per envelope, flatten every DocuSign recipient bucket (extended for F04) =====
 
-// Pure transform: flattens one envelope's raw /recipients JSON record (as returned
-// by DocuSign) across every recipient bucket into a flat row list. No I/O, so this
-// is directly unit-testable with hand-built fixture records.
-shared DocuSignPowerBI.FlattenRecipients = (raw as record, envelopeId as text) as list =>
+// Pure transform: flattens one envelope's raw /recipients JSON record (as returned by DocuSign)
+// across every recipient bucket into a flat row list. No I/O, so this is directly unit-testable
+// with hand-built fixture records. `accountId` is optional to preserve the original 2-argument
+// call shape used by earlier tests and callers.
+shared DocuSignPowerBI.FlattenRecipients = (raw as record, envelopeId as text, optional accountId as nullable text) as list =>
     List.Combine(List.Transform(RecipientBuckets, (bucket) =>
         List.Transform(Record.FieldOrDefault(raw, bucket, {}), (person) =>
-            [
+            let
+                sentDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(person, "sentDateTime", null)),
+                signedDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(person, "signedDateTime", null))
+            in [
+                AccountId = accountId,
                 EnvelopeId = envelopeId,
                 RecipientId = Record.FieldOrDefault(person, "recipientId", null),
                 RecipientName = Record.FieldOrDefault(person, "name", null),
                 RecipientEmail = Record.FieldOrDefault(person, "email", null),
                 RecipientType = bucket,
+                RecipientRole = Record.FieldOrDefault(person, "roleName", null),
                 RoutingOrder = DocuSignPowerBI.SafeNumber(Record.FieldOrDefault(person, "routingOrder", null)),
                 RecipientStatus = Record.FieldOrDefault(person, "status", null),
-                SignedDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(person, "signedDateTime", null)),
-                DeliveredDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(person, "deliveredDateTime", null))
+                SentDateTime = sentDateTime,
+                SignedDateTime = signedDateTime,
+                DeliveredDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(person, "deliveredDateTime", null)),
+                DeclinedDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(person, "declinedDateTime", null)),
+                DeclineReason = Record.FieldOrDefault(person, "declineReason", null),
+                AuthenticationMethod = Record.FieldOrDefault(person, "authenticationMethod", null),
+                CompletionHours =
+                    if sentDateTime <> null and signedDateTime <> null and signedDateTime >= sentDateTime
+                    then Duration.TotalHours(signedDateTime - sentDateTime)
+                    else null
             ])));
 
 shared DocuSignPowerBI.BuildRecipientsTable = (base as text, accountId as text, token as text, envelopes as table) as table =>
@@ -308,7 +416,7 @@ shared DocuSignPowerBI.BuildRecipientsTable = (base as text, accountId as text, 
         rows = List.Combine(List.Transform(ids, (envelopeId) =>
             let
                 raw = DocuSignPowerBI.HttpGetWithRetry(base, "restapi/v2.1/accounts/" & accountId & "/envelopes/" & envelopeId & "/recipients", token, null, 0)
-            in DocuSignPowerBI.FlattenRecipients(raw, envelopeId)))
+            in DocuSignPowerBI.FlattenRecipients(raw, envelopeId, accountId)))
     in
         Table.FromRecords(rows, RecipientsRowType, MissingField.UseNull);
 
@@ -327,6 +435,170 @@ shared DocuSignPowerBI.BuildStatusTable = (envelopes as table) as table =>
             else null, type nullable number),
         result = Table.SelectColumns(withHours, {"EnvelopeId", "Status", "IsCompleted", "IsPending", "IsDeclined", "IsVoided", "SentDateTime", "CompletedDateTime", "CompletionHours"})
     in result;
+
+// ===== Envelope Custom Fields (F01) =====
+
+// Pure transform: flattens one envelope's raw /custom_fields JSON record into a flat row list.
+shared DocuSignPowerBI.FlattenCustomFields = (raw as record, accountId as nullable text, envelopeId as text) as list =>
+    let
+        textFields = List.Transform(Record.FieldOrDefault(raw, "textCustomFields", {}), (f) =>
+            [
+                AccountId = accountId, EnvelopeId = envelopeId,
+                FieldName = Record.FieldOrDefault(f, "name", null),
+                FieldValue = Record.FieldOrDefault(f, "value", null),
+                FieldType = "text",
+                Show = DocuSignPowerBI.SafeBool(Record.FieldOrDefault(f, "show", null)),
+                Required = DocuSignPowerBI.SafeBool(Record.FieldOrDefault(f, "required", null))
+            ]),
+        listFields = List.Transform(Record.FieldOrDefault(raw, "listCustomFields", {}), (f) =>
+            [
+                AccountId = accountId, EnvelopeId = envelopeId,
+                FieldName = Record.FieldOrDefault(f, "name", null),
+                FieldValue = Record.FieldOrDefault(f, "value", null),
+                FieldType = "list",
+                Show = DocuSignPowerBI.SafeBool(Record.FieldOrDefault(f, "show", null)),
+                Required = DocuSignPowerBI.SafeBool(Record.FieldOrDefault(f, "required", null))
+            ])
+    in textFields & listFields;
+
+shared DocuSignPowerBI.BuildCustomFieldsTable = (base as text, accountId as text, token as text, envelopes as table) as table =>
+    let
+        ids = if Table.HasColumns(envelopes, "EnvelopeId") then List.RemoveNulls(Table.Column(envelopes, "EnvelopeId")) else {},
+        rows = List.Combine(List.Transform(ids, (envelopeId) =>
+            let
+                raw = DocuSignPowerBI.HttpGetWithRetry(base, "restapi/v2.1/accounts/" & accountId & "/envelopes/" & envelopeId & "/custom_fields", token, null, 0)
+            in DocuSignPowerBI.FlattenCustomFields(raw, accountId, envelopeId))),
+        asTable = Table.FromRecords(rows, CustomFieldsRowType, MissingField.UseNull)
+    in
+        Table.Distinct(asTable, {"EnvelopeId", "FieldName"});
+
+// ===== Envelope Audit Events (F03) =====
+//
+// DocuSign's audit_events response has no fixed per-event schema: each event is a generic
+// {name, value} list ("eventFields"), and the actual name keys vary by event type / API version
+// (confirmed values from DocuSign's own developer blog include "UserName", "logTime", "Action";
+// others like IP address / description are not consistently documented). GetEventField below tries
+// several plausible aliases in priority order and falls back to null rather than guessing wrong -
+// this is a known area that needs validation against a live tenant (see README).
+shared DocuSignPowerBI.GetEventField = (fields as list, candidates as list) as nullable text =>
+    let
+        tryOne = (name as text) as nullable text =>
+            let matches = List.Select(fields, each Record.FieldOrDefault(_, "name", null) = name)
+            in if List.IsEmpty(matches) then null else (let v = Record.FieldOrDefault(matches{0}, "value", null) in if v = null then null else Text.From(v)),
+        found = List.Select(List.Transform(candidates, each tryOne(_)), each _ <> null)
+    in if List.IsEmpty(found) then null else found{0};
+
+shared DocuSignPowerBI.FlattenAuditEvents = (raw as record, accountId as nullable text, envelopeId as text) as list =>
+    List.Transform(Record.FieldOrDefault(raw, "auditEvents", {}), (e) =>
+        let fields = Record.FieldOrDefault(e, "eventFields", {})
+        in [
+            AccountId = accountId,
+            EnvelopeId = envelopeId,
+            EventDateTime = DocuSignPowerBI.ToDateTimeZone(DocuSignPowerBI.GetEventField(fields, {"EventDateTime", "logTime", "Date"})),
+            EventType = DocuSignPowerBI.GetEventField(fields, {"EventType", "Action", "EventName"}),
+            EventDescription = DocuSignPowerBI.GetEventField(fields, {"EventDescription", "Description"}),
+            UserName = DocuSignPowerBI.GetEventField(fields, {"UserName", "User Name", "Full Name"}),
+            UserEmail = DocuSignPowerBI.GetEventField(fields, {"Email", "UserEmail", "Email Address"}),
+            IPAddress = DocuSignPowerBI.GetEventField(fields, {"IP Address", "IPAddress", "ip"}),
+            Action = DocuSignPowerBI.GetEventField(fields, {"Action", "EventType"}),
+            Result = DocuSignPowerBI.GetEventField(fields, {"Result", "Status"})
+        ]);
+
+shared DocuSignPowerBI.BuildAuditEventsTable = (base as text, accountId as text, token as text, envelopes as table) as table =>
+    let
+        ids = if Table.HasColumns(envelopes, "EnvelopeId") then List.RemoveNulls(Table.Column(envelopes, "EnvelopeId")) else {},
+        rows = List.Combine(List.Transform(ids, (envelopeId) =>
+            let
+                raw = DocuSignPowerBI.HttpGetWithRetry(base, "restapi/v2.1/accounts/" & accountId & "/envelopes/" & envelopeId & "/audit_events", token, null, 0)
+            in DocuSignPowerBI.FlattenAuditEvents(raw, accountId, envelopeId))),
+        asTable = Table.FromRecords(rows, AuditEventsRowType, MissingField.UseNull)
+    in
+        Table.Distinct(asTable);
+
+// ===== Templates (F06) =====
+//
+// DocuSign's templates list response uses the same resultSetSize/totalSetSize/endPosition
+// pagination shape as envelopes, but the array field is "envelopeTemplates" and the created-date
+// field is "created" (not "createdDateTime" like envelopes) - both confirmed against the current
+// API reference. "status" is not part of this endpoint's schema at all (see TemplatesRowType note).
+shared DocuSignPowerBI.GetTemplatesRaw = (base as text, accountId as text, token as text) as list =>
+    let
+        path = "restapi/v2.1/accounts/" & accountId & "/templates",
+        pageSize = 100,
+        FetchPage = (startPosition as number) as record =>
+            DocuSignPowerBI.HttpGetWithRetry(base, path, token, [start_position = Text.From(startPosition), count = Text.From(pageSize)], 0),
+        pages = List.Generate(
+            () => [response = FetchPage(0), hasMore = true],
+            each [hasMore],
+            each
+                let
+                    resultSetSize = DocuSignPowerBI.SafeInt(Record.FieldOrDefault([response], "resultSetSize", 0)),
+                    totalSetSize = DocuSignPowerBI.SafeInt(Record.FieldOrDefault([response], "totalSetSize", 0)),
+                    endPosition = DocuSignPowerBI.SafeInt(Record.FieldOrDefault([response], "endPosition", -1)),
+                    more = resultSetSize > 0 and (endPosition + 1) < totalSetSize
+                in [
+                    response = if more then FetchPage(endPosition + 1) else [envelopeTemplates = {}],
+                    hasMore = more
+                ],
+            each Record.FieldOrDefault([response], "envelopeTemplates", {})
+        )
+    in List.Combine(pages);
+
+shared DocuSignPowerBI.BuildTemplatesTable = (rawTemplates as list, accountId as nullable text) as table =>
+    let
+        records = List.Transform(rawTemplates, (t) =>
+            let owner = Record.FieldOrDefault(t, "owner", null)
+            in [
+                AccountId = accountId,
+                TemplateId = Record.FieldOrDefault(t, "templateId", null),
+                TemplateName = Record.FieldOrDefault(t, "name", null),
+                Description = Record.FieldOrDefault(t, "description", null),
+                CreatedDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(t, "created", Record.FieldOrDefault(t, "createdDateTime", null))),
+                LastModifiedDateTime = DocuSignPowerBI.ToDateTime(Record.FieldOrDefault(t, "lastModifiedDateTime", null)),
+                OwnerName = if owner = null then null else Record.FieldOrDefault(owner, "userName", null),
+                Shared = DocuSignPowerBI.SafeBool(Record.FieldOrDefault(t, "shared", null)),
+                Status = Record.FieldOrDefault(t, "status", null)
+            ])
+    in
+        Table.FromRecords(records, TemplatesRowType, MissingField.UseNull);
+
+// ===== Envelope Documents (F07) - metadata only, no binary content ever requested =====
+
+shared DocuSignPowerBI.FlattenDocuments = (raw as record, accountId as nullable text, envelopeId as text) as list =>
+    List.Transform(Record.FieldOrDefault(raw, "envelopeDocuments", {}), (d) =>
+        [
+            AccountId = accountId,
+            EnvelopeId = envelopeId,
+            DocumentId = Record.FieldOrDefault(d, "documentId", null),
+            DocumentName = Record.FieldOrDefault(d, "name", null),
+            DocumentType = Record.FieldOrDefault(d, "type", null),
+            Order = DocuSignPowerBI.SafeNumber(Record.FieldOrDefault(d, "order", null)),
+            Pages = List.Count(Record.FieldOrDefault(d, "pages", {}))
+        ]);
+
+shared DocuSignPowerBI.BuildDocumentsTable = (base as text, accountId as text, token as text, envelopes as table) as table =>
+    let
+        ids = if Table.HasColumns(envelopes, "EnvelopeId") then List.RemoveNulls(Table.Column(envelopes, "EnvelopeId")) else {},
+        rows = List.Combine(List.Transform(ids, (envelopeId) =>
+            let
+                raw = DocuSignPowerBI.HttpGetWithRetry(base, "restapi/v2.1/accounts/" & accountId & "/envelopes/" & envelopeId & "/documents", token, null, 0)
+            in DocuSignPowerBI.FlattenDocuments(raw, accountId, envelopeId)))
+    in
+        Table.FromRecords(rows, DocumentsRowType, MissingField.UseNull);
+
+// ===== Accounts (F05) - no extra API call, derived from the already-fetched /oauth/userinfo accounts list =====
+
+shared DocuSignPowerBI.BuildAccountsTable = (accounts as list, environment as text) as table =>
+    let
+        records = List.Transform(accounts, (a) =>
+            [
+                AccountId = Record.FieldOrDefault(a, "account_id", null),
+                AccountName = Record.FieldOrDefault(a, "account_name", null),
+                IsDefault = Record.FieldOrDefault(a, "is_default", false) = true,
+                Environment = environment
+            ])
+    in
+        Table.FromRecords(records, AccountsRowType, MissingField.UseNull);
 
 // ===== Navigator helper (standard Microsoft DataConnectors sample helper) =====
 

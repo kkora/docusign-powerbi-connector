@@ -58,7 +58,7 @@ shared DocuSignPowerBI.Test.Transforms = PQTest(
         Fact("DATA-10 total distinct envelope count is 3 (e1, e2, e3)", 3, Table.RowCount(envelopesDistinct)),
 
         // DATA-03 / DATA-04: Recipients schema and types, across multiple recipient buckets.
-        Fact("DATA-03 Recipients rows have exactly the required columns", {"EnvelopeId", "RecipientId", "RecipientName", "RecipientEmail", "RecipientType", "RoutingOrder", "RecipientStatus", "SignedDateTime", "DeliveredDateTime"}, Record.FieldNames(signerRow)),
+        Fact("DATA-03 Recipients rows have exactly the required columns (extended by F04)", {"AccountId", "EnvelopeId", "RecipientId", "RecipientName", "RecipientEmail", "RecipientType", "RecipientRole", "RoutingOrder", "RecipientStatus", "SentDateTime", "SignedDateTime", "DeliveredDateTime", "DeclinedDateTime", "DeclineReason", "AuthenticationMethod", "CompletionHours"}, Record.FieldNames(signerRow)),
         Fact("DATA-04 a signer bucket recipient is flattened with RecipientType = signers", "signers", signerRow[RecipientType]),
         Fact("DATA-04 a carbonCopies bucket recipient is flattened with RecipientType = carbonCopies", "carbonCopies", ccRow[RecipientType]),
         Fact("DATA-04 RoutingOrder is converted from the API's string number to a numeric type", 1, signerRow[RoutingOrder]),
