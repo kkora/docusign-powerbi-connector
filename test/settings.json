@@ -1,0 +1,18 @@
+{
+  "TestCredentials": [
+    {
+      "Kind": "DocuSignPowerBI",
+      "Pattern": "*",
+      "Type": "OAuthPlaceholder",
+      "Settings": {
+        "AccessToken": "TestAccessToken123",
+        "RefreshToken": "TestRefreshToken456"
+      }
+    },
+    {
+      "Kind": "Web",
+      "Pattern": "*",
+      "Type": "Anonymous"
+    }
+  ]
+}

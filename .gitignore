@@ -1,0 +1,11 @@
+# Power Query SDK / MSBuild intermediate output
+obj/
+
+# Visual Studio / VS Code
+.vs/
+*.user
+*.suo
+
+# OS junk
+.DS_Store
+Thumbs.db

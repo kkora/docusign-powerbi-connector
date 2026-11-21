@@ -1,28 +1,69 @@
-# DocuSign Power BI Connector — source prototype
+# DocuSign Power BI Connector
 
-This is a source prototype, **not a validated or production-ready .mez**. It has not been compiled or tested against DocuSign or Power BI. The current source is Demo-only. The `TestConnection` handler and navigator presentation require validation with the Power Query SDK and gateway. Do not use for production refresh without completing the checklist below.
+Custom Power Query connector for DocuSign eSignature (REST API v2.1), using OAuth 2.0 Authorization Code with PKCE (S256). Exposes exactly three tables: **Envelopes**, **Recipients**, **Envelope Status**.
 
-## Configuration
-1. Create/configure a DocuSign public-client Integration Key for Authorization Code with PKCE (no embedded client secret).
-2. Register `https://oauth.powerbi.com/views/oauthredirect.html` as the exact redirect URI, subject to DocuSign application settings and verification.
-3. Replace `REPLACE_WITH_DOCUSIGN_INTEGRATION_KEY` in `DocuSignPowerBI.pq`.
-4. Install VS Code and Microsoft Power Query SDK; create a connector project and replace the generated `.pq` source with this file. Build the project to produce `.mez`.
-5. Install `.mez` in `[Documents]\Power BI Desktop\Custom Connectors`; allow trusted unsigned extensions during local development and restart Desktop.
-6. Connect using `DocuSignPowerBI.Contents("Demo", "2026-01-01")` and select the resulting table's `Data` cells. This prototype does not yet implement a standard navigation table.
+Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 91/91 automated Facts pass against the compiled `.mez`; live Power BI Desktop/gateway/Service steps are documented below but not executed by this repo (they require interactive login and provisioned infrastructure).
 
-## Gateway
-1. Install a supported Windows on-premises data gateway (standard mode recommended).
-2. Configure its custom connectors directory, place the identical `.mez` there, enable custom connector loading, and restart the gateway service.
-3. In Power BI Service, configure a gateway data source and OAuth credentials as a gateway admin. Map the published semantic model to it, then enable scheduled refresh.
+## Prerequisites
 
-## Validation required before claiming completion
-- Build and load in Power BI Desktop, and validate OAuth authorization, state, PKCE, token refresh, and redirect.
-- Validate `TestConnection` with the gateway; the current hard-coded date/parameter mapping is not adequate for arbitrary `fromDate` values.
-- Verify the default account selection, pagination behavior and rate-limit handling against real API responses.
-- Add safe retries for 429/5xx, optional date range and incremental refresh strategy.
-- Replace Demo-only host handling with an explicit environment selector and verified production base URI.
-- Implement proper navigation metadata and stable typed table schemas.
-- Validate gateway service OAuth refresh and end-to-end scheduled refresh.
+- A DocuSign **Demo** account (`account-d.docusign.com`) and a public-client Integration Key configured for Authorization Code + PKCE (no client secret).
+- Redirect URI registered on the Integration Key: `https://oauth.powerbi.com/views/oauthredirect.html`.
+- VS Code with the Power Query SDK extension (`powerquery.vscode-powerquery-sdk`), or just `dotnet` + the SDK's bundled `PQTest.exe`/MSBuild tasks.
+
+The Integration Key (`ClientId`) is already set in `DocuSignPowerBI.pq` — do not replace it.
+
+## Building
+
+```sh
+dotnet msbuild DocuSignPowerBI.proj /t:BuildMez
+```
+
+Produces `bin\AnyCPU\Debug\DocuSignPowerBI.mez`.
+
+## Running the automated tests
+
+No real DocuSign credentials are used. Unit tests are pure M (no network); integration tests run against the real compiled M code with HTTP responses mocked by PQTest's `--httpMock`, using an `OAuthPlaceholder` test credential (`test/settings.json`).
+
+```sh
+# Pure unit tests (PKCE, OAuth helpers, data transforms, null-safety)
+PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\unit -p
+
+# HTTP-mocked integration tests (pagination, errors, OAuth token exchange, full Contents() flow)
+PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration -hm test\mocks\docusign-mocks.txt -sf test\settings.json -p -tf "!06_unauthorized.query.pq"
+
+# 401 -> refresh -> retry evidence (expected to fail with AccessUnauthorized - see TEST-RESULTS.md)
+PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration\06_unauthorized.query.pq -hm test\mocks\docusign-mocks.txt -sf test\settings.json -p
+```
+
+`PQTest.exe` ships inside the VS Code extension, typically at:
+`%USERPROFILE%\.vscode\extensions\powerquery.vscode-powerquery-sdk-*\.nuget\Microsoft.PowerQuery.SdkTools.*\tools\PQTest.exe`
+
+## Power BI Desktop installation
+
+1. Build the `.mez` (above), or use the one already in `bin\AnyCPU\Debug\`.
+2. Copy `DocuSignPowerBI.mez` to `%USERPROFILE%\Documents\Power BI Desktop\Custom Connectors\` (create the folder if it doesn't exist).
+3. In Power BI Desktop: **File → Options and settings → Options → Security → Data Extensions** → select **"Allow any extension to load without validation or warning"** (required for an unsigned connector in development).
+4. Restart Power BI Desktop.
+5. **Get Data → More... → Online Services → DocuSign eSignature**, then enter `Demo` (and optionally a `fromDate` in `YYYY-MM-DD` form).
+6. Sign in with a DocuSign Demo account when prompted (OAuth browser dialog).
+7. In Navigator, select **Envelopes**, **Recipients**, and/or **Envelope Status** and load.
+
+## Power BI Service / on-premises gateway installation
+
+1. Install a Windows on-premises data gateway (standard mode) on a machine with network access to `account-d.docusign.com` and `demo.docusign.net`.
+2. On the gateway machine, open the **On-premises data gateway** app → **Connectors** tab → set/confirm the custom connectors directory (default `C:\Program Files\On-premises data gateway\Custom Connectors` next to the gateway installer, or a custom path you configure there).
+3. Copy the same `DocuSignPowerBI.mez` into that directory.
+4. Restart the **On-premises data gateway service** (via the gateway app, or `services.msc` → "On-premises data gateway service").
+5. In the Power BI Service (as a gateway admin): **Settings → Manage gateways** → select the gateway → **Add data source** → pick the custom connector (it will appear once the gateway picks up the `.mez`) → authenticate with OAuth as a DocuSign Demo user.
+6. Publish the report/semantic model that uses this connector, then in the dataset's **Settings → Gateway connection**, map it to the gateway data source configured above.
+7. Under **Scheduled refresh**, enable refresh and set a schedule; check **Refresh history** after the first run to confirm success.
+
+OAuth connectors on gateways have real constraints (token refresh must succeed unattended, and some tenants restrict custom connectors by policy) — confirm with your gateway admin before relying on this for production refresh.
+
+## Known limitations
+
+See "Known limitations" in [TEST-RESULTS.md](TEST-RESULTS.md) — in short: the `Production` DocuSign environment is implemented identically to `Demo` but has not been exercised against a live tenant; `EnvironmentFromPath` is a best-effort/defensive parse (Power Query does not document a way to deserialize a function data source's `dataSourcePath`); and 429/5xx retry recovery is proven via the bounded-retry-then-fail path, not a "fails then succeeds" path (not expressible with PQTest's stateless HTTP mock server).
 
 ## Notes
-This uses the eSignature API only; no envelope documents are downloaded. Recipients are requested individually for each envelope, which may be slow or hit rate limits for large datasets.
+
+This uses the eSignature API only; no envelope documents are downloaded. Recipients are requested individually per envelope, which may be slow or encounter rate limits for accounts with many envelopes — HTTP 429 is retried with bounded exponential backoff (see `MaxRetryAttempts`/`BaseRetryDelaySeconds`/`MaxRetryDelaySeconds` in `DocuSignPowerBI.pq`).
