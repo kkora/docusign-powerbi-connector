@@ -1,0 +1,50 @@
+table Accounts
+	lineageTag: 37cf2572-36d2-4da0-8ccb-741eeb54c909
+
+	column AccountId
+		dataType: string
+		lineageTag: aa0fc8ae-bbe8-409a-a619-10a8ebe357f4
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountName
+		dataType: string
+		lineageTag: 99ccd9eb-8b27-42d0-9367-f2f0680db41b
+		summarizeBy: none
+		sourceColumn: AccountName
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsDefault
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8eb4cc9d-078c-451a-a053-fee34a15497c
+		summarizeBy: none
+		sourceColumn: IsDefault
+
+		annotation SummarizationSetBy = Automatic
+
+	column Environment
+		dataType: string
+		lineageTag: 13a7b906-a7f9-4aa1-88fa-0b1dbc5e6f6e
+		summarizeBy: none
+		sourceColumn: Environment
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Accounts' = COUNTROWS(Accounts)
+		formatString: #,0
+		lineageTag: b34d7ce1-cdc0-4b26-bc10-be64da0a3679
+
+	partition Accounts = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Data = Source{[Name="Accounts"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

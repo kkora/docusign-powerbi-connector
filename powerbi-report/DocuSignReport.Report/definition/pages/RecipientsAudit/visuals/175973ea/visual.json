@@ -1,0 +1,42 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "name": "175973ea",
+  "position": { "x": 700, "y": 20, "z": 0, "width": 560, "height": 430, "tabOrder": 4 },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Recipients" } }, "Property": "RecipientName" } },
+              "queryRef": "Recipients.RecipientName",
+              "nativeQueryRef": "RecipientName"
+            },
+            {
+              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Recipients" } }, "Property": "RecipientType" } },
+              "queryRef": "Recipients.RecipientType",
+              "nativeQueryRef": "RecipientType"
+            },
+            {
+              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Recipients" } }, "Property": "RecipientStatus" } },
+              "queryRef": "Recipients.RecipientStatus",
+              "nativeQueryRef": "RecipientStatus"
+            },
+            {
+              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Recipients" } }, "Property": "AuthenticationMethod" } },
+              "queryRef": "Recipients.AuthenticationMethod",
+              "nativeQueryRef": "AuthenticationMethod"
+            },
+            {
+              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Recipients" } }, "Property": "CompletionHours" } },
+              "queryRef": "Recipients.CompletionHours",
+              "nativeQueryRef": "CompletionHours"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {}
+  }
+}

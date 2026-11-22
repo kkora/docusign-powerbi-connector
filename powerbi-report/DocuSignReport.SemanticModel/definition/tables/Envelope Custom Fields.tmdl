@@ -1,0 +1,79 @@
+table 'Envelope Custom Fields'
+	lineageTag: 7ff35fe7-f4fa-44ba-b0fc-b496995d748c
+
+	column AccountId
+		dataType: string
+		lineageTag: 071b4352-93f7-4421-9741-9405d368e36e
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column EnvelopeId
+		dataType: string
+		lineageTag: 7bdd82c5-f427-4548-91d5-279a8d3b2154
+		summarizeBy: none
+		sourceColumn: EnvelopeId
+
+		annotation SummarizationSetBy = Automatic
+
+	column FieldName
+		dataType: string
+		lineageTag: 21d01e83-8c02-43d8-b3d2-96524af3f48f
+		summarizeBy: none
+		sourceColumn: FieldName
+
+		annotation SummarizationSetBy = Automatic
+
+	column FieldValue
+		dataType: string
+		lineageTag: b5081015-007f-455d-9611-29a2ae6a0197
+		summarizeBy: none
+		sourceColumn: FieldValue
+
+		annotation SummarizationSetBy = Automatic
+
+	column FieldType
+		dataType: string
+		lineageTag: eb98b989-4706-43cf-bec0-ba2d32c49be8
+		summarizeBy: none
+		sourceColumn: FieldType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Show
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a3061491-5ee9-47b5-9214-f6a773b881bf
+		summarizeBy: none
+		sourceColumn: Show
+
+		annotation SummarizationSetBy = Automatic
+
+	column Required
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 58e378b3-9410-4ce7-b801-163f88be48f3
+		summarizeBy: none
+		sourceColumn: Required
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Custom Fields' = COUNTROWS('Envelope Custom Fields')
+		formatString: #,0
+		lineageTag: c50fed5e-cdaf-4f50-9be6-1252cb867176
+
+	measure 'Required Fields Not Shown' = CALCULATE(COUNTROWS('Envelope Custom Fields'), 'Envelope Custom Fields'[Required] = TRUE, 'Envelope Custom Fields'[Show] = FALSE)
+		formatString: #,0
+		lineageTag: f7465271-b06a-4723-b9b4-141b44171cdc
+
+	partition 'Envelope Custom Fields' = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Data = Source{[Name="Envelope Custom Fields"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

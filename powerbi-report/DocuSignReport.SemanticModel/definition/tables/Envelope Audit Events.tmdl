@@ -1,0 +1,102 @@
+table 'Envelope Audit Events'
+	lineageTag: c430e2f0-9994-471b-ad9b-dca23b07169e
+
+	column AccountId
+		dataType: string
+		lineageTag: 36424a27-b4c4-4bef-a36c-93c2aec045ad
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column EnvelopeId
+		dataType: string
+		lineageTag: b82a9fa6-bd0e-4a9c-884a-4f6feda1ac75
+		summarizeBy: none
+		sourceColumn: EnvelopeId
+
+		annotation SummarizationSetBy = Automatic
+
+	column EventDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 96da8f39-b170-40c1-887b-9944e490611f
+		summarizeBy: none
+		sourceColumn: EventDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column EventType
+		dataType: string
+		lineageTag: cf235156-cf50-4b4f-a2a1-301496ce219e
+		summarizeBy: none
+		sourceColumn: EventType
+
+		annotation SummarizationSetBy = Automatic
+
+	column EventDescription
+		dataType: string
+		lineageTag: 316fb665-4dc4-4287-ac28-6a1e2dee4779
+		summarizeBy: none
+		sourceColumn: EventDescription
+
+		annotation SummarizationSetBy = Automatic
+
+	column UserName
+		dataType: string
+		lineageTag: 8e4323fe-6f91-419a-9191-9d004899aca9
+		summarizeBy: none
+		sourceColumn: UserName
+
+		annotation SummarizationSetBy = Automatic
+
+	column UserEmail
+		dataType: string
+		lineageTag: a4b711dd-7b29-488b-b808-1abf1ddaf6f1
+		summarizeBy: none
+		sourceColumn: UserEmail
+
+		annotation SummarizationSetBy = Automatic
+
+	column IPAddress
+		dataType: string
+		lineageTag: 76cbe9d5-36e7-43a5-b8df-9a7efbec5108
+		summarizeBy: none
+		sourceColumn: IPAddress
+
+		annotation SummarizationSetBy = Automatic
+
+	column Action
+		dataType: string
+		lineageTag: 01bf31b6-c550-4928-936c-ae6f764ce330
+		summarizeBy: none
+		sourceColumn: Action
+
+		annotation SummarizationSetBy = Automatic
+
+	column Result
+		dataType: string
+		lineageTag: 3e1ae055-a63b-4a2c-9252-f9cde61c7199
+		summarizeBy: none
+		sourceColumn: Result
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Audit Events' = COUNTROWS('Envelope Audit Events')
+		formatString: #,0
+		lineageTag: 75d6f947-ed63-47be-a12a-3da9bb313f24
+
+	measure 'Distinct Event Actions' = DISTINCTCOUNT('Envelope Audit Events'[Action])
+		formatString: #,0
+		lineageTag: d09fb66e-ed77-4076-ad48-10cc8a1337ae
+
+	partition 'Envelope Audit Events' = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Data = Source{[Name="Envelope Audit Events"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

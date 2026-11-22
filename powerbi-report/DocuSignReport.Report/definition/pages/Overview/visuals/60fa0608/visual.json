@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "name": "60fa0608",
+  "position": { "x": 20, "y": 150, "z": 0, "width": 580, "height": 300, "tabOrder": 5 },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": { "SourceRef": { "Entity": "Envelopes" } },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "Envelopes.Status",
+              "nativeQueryRef": "Status"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": { "SourceRef": { "Entity": "Envelopes" } },
+                  "Property": "Total Envelopes"
+                }
+              },
+              "queryRef": "Envelopes.Total Envelopes",
+              "nativeQueryRef": "Total Envelopes"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {}
+  }
+}

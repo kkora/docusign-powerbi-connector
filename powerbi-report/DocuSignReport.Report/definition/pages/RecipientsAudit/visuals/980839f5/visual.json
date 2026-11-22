@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "name": "980839f5",
+  "position": { "x": 260, "y": 150, "z": 0, "width": 420, "height": 300, "tabOrder": 3 },
+  "visual": {
+    "visualType": "barChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Envelope Audit Events" } }, "Property": "Action" } },
+              "queryRef": "Envelope Audit Events.Action",
+              "nativeQueryRef": "Action"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": { "SourceRef": { "Entity": "Envelope Audit Events" } },
+                  "Property": "Total Audit Events"
+                }
+              },
+              "queryRef": "Envelope Audit Events.Total Audit Events",
+              "nativeQueryRef": "Total Audit Events"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {}
+  }
+}

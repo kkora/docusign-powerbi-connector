@@ -1,0 +1,163 @@
+table Recipients
+	lineageTag: 65640913-4005-413a-abc9-0ae410601d4a
+
+	column AccountId
+		dataType: string
+		lineageTag: f6f8a1e7-5552-4491-93b5-2abd15034939
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column EnvelopeId
+		dataType: string
+		lineageTag: 34cde2d2-3bec-422e-a41a-2fe091ca7ed9
+		summarizeBy: none
+		sourceColumn: EnvelopeId
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecipientId
+		dataType: string
+		lineageTag: 5f773a02-e720-49ac-a210-5fcdbdba0acd
+		summarizeBy: none
+		sourceColumn: RecipientId
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecipientName
+		dataType: string
+		lineageTag: 2dd1e6b2-1016-4649-8cf0-67a862125f66
+		summarizeBy: none
+		sourceColumn: RecipientName
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecipientEmail
+		dataType: string
+		lineageTag: cbee49ce-6d17-476a-9276-072b132d1c9c
+		summarizeBy: none
+		sourceColumn: RecipientEmail
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecipientType
+		dataType: string
+		lineageTag: 73b042eb-96fa-4573-a022-79140b10bf02
+		summarizeBy: none
+		sourceColumn: RecipientType
+
+		annotation SummarizationSetBy = Automatic
+
+	column RecipientRole
+		dataType: string
+		lineageTag: a485b81c-bca7-4df8-8bc7-1780d68c77e7
+		summarizeBy: none
+		sourceColumn: RecipientRole
+
+		annotation SummarizationSetBy = Automatic
+
+	column RoutingOrder
+		dataType: double
+		lineageTag: ade6ea97-9934-487f-b8a5-1ceda3e569f1
+		summarizeBy: none
+		sourceColumn: RoutingOrder
+
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column RecipientStatus
+		dataType: string
+		lineageTag: 04968452-4fa6-4c79-bffd-64b7bdc0d81e
+		summarizeBy: none
+		sourceColumn: RecipientStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	column SentDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: da2ace60-0e50-490a-a7bb-bdebf0004a61
+		summarizeBy: none
+		sourceColumn: SentDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column SignedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f700c347-b22b-48db-964c-d204a4374bb8
+		summarizeBy: none
+		sourceColumn: SignedDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column DeliveredDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 09d42704-9253-42cf-8406-678cdaba6d2c
+		summarizeBy: none
+		sourceColumn: DeliveredDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column DeclinedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ffa58c7b-b099-4e1e-9ac8-45e462b8745c
+		summarizeBy: none
+		sourceColumn: DeclinedDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column DeclineReason
+		dataType: string
+		lineageTag: 918442e4-4370-4e59-b919-a7197855edbb
+		summarizeBy: none
+		sourceColumn: DeclineReason
+
+		annotation SummarizationSetBy = Automatic
+
+	column AuthenticationMethod
+		dataType: string
+		lineageTag: d5b195e3-9f18-4d26-b351-69b2f28efdc3
+		summarizeBy: none
+		sourceColumn: AuthenticationMethod
+
+		annotation SummarizationSetBy = Automatic
+
+	column CompletionHours
+		dataType: double
+		lineageTag: 34638701-b6d4-47f1-8dec-ce7db301efb9
+		summarizeBy: none
+		sourceColumn: CompletionHours
+
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Recipients' = COUNTROWS(Recipients)
+		formatString: #,0
+		lineageTag: 24cffc22-f0ce-4559-97a6-dd04cad1730b
+
+	measure 'Declined Recipients' = CALCULATE(COUNTROWS(Recipients), Recipients[DeclineReason] <> BLANK())
+		formatString: #,0
+		lineageTag: 1c8b1247-9568-47bf-af6a-d43529778e43
+
+	measure 'Avg Recipient Turnaround Hours' = AVERAGE(Recipients[CompletionHours])
+		formatString: #,0.0
+		lineageTag: fb93a33b-9f4e-4342-92ee-c1de7f3f552d
+
+	measure 'Distinct Authentication Methods' = DISTINCTCOUNT(Recipients[AuthenticationMethod])
+		formatString: #,0
+		lineageTag: 7f7e8831-c598-4c1c-b332-f89dfcf3f337
+
+	partition Recipients = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Data = Source{[Name="Recipients"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

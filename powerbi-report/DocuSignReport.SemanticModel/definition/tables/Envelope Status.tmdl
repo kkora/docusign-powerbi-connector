@@ -1,0 +1,108 @@
+table 'Envelope Status'
+	lineageTag: be3aaa10-9c75-4310-ad8a-8650e3f52315
+
+	column EnvelopeId
+		dataType: string
+		lineageTag: a2f36e4f-a683-430c-b556-f75af3222834
+		summarizeBy: none
+		sourceColumn: EnvelopeId
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 66499272-fea3-4589-bf35-b4c7349237d4
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCompleted
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9ae619a3-4633-44c1-8711-31f40d93f73b
+		summarizeBy: none
+		sourceColumn: IsCompleted
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsPending
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2e69bef7-93dd-4703-a65b-092bf1d64b62
+		summarizeBy: none
+		sourceColumn: IsPending
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsDeclined
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6ef9ac78-869a-45ae-b570-55231e64ce0b
+		summarizeBy: none
+		sourceColumn: IsDeclined
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsVoided
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: b2d720b7-4afc-4579-a524-b94d76ac36bd
+		summarizeBy: none
+		sourceColumn: IsVoided
+
+		annotation SummarizationSetBy = Automatic
+
+	column SentDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b1f4be71-dd36-48c3-8074-eef43c783b3c
+		summarizeBy: none
+		sourceColumn: SentDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column CompletedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f4b11635-8dee-4e3f-80ca-09e6cc9e44c5
+		summarizeBy: none
+		sourceColumn: CompletedDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column CompletionHours
+		dataType: double
+		lineageTag: e8a64341-68f8-49e5-8ad9-e2bd77c3bba8
+		summarizeBy: none
+		sourceColumn: CompletionHours
+
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Completion Hours' = AVERAGE('Envelope Status'[CompletionHours])
+		formatString: #,0.0
+		lineageTag: 6a25695c-5493-41c2-95df-abfea16fa23b
+
+	measure 'Completed %' = DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsCompleted] = TRUE), COUNTROWS('Envelope Status'))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 60c0f09f-c9d6-4adc-a987-957c7348e2ae
+
+	measure 'Pending %' = DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsPending] = TRUE), COUNTROWS('Envelope Status'))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: a5fe07bc-0027-4d2a-899d-2a88ae6f468e
+
+	measure 'Voided %' = DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsVoided] = TRUE), COUNTROWS('Envelope Status'))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 6448519d-8ddb-4afd-a715-d57e041f94bc
+
+	partition 'Envelope Status' = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Data = Source{[Name="Envelope Status"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

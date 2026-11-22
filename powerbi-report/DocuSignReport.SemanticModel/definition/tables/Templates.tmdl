@@ -1,0 +1,96 @@
+table Templates
+	lineageTag: d72e25f6-43da-4617-80f3-7649d090c522
+
+	column AccountId
+		dataType: string
+		lineageTag: 7a07fce7-7cb2-4a69-a01b-def50568388b
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column TemplateId
+		dataType: string
+		lineageTag: f468973c-ebf9-4ae2-9695-3812353a27f4
+		summarizeBy: none
+		sourceColumn: TemplateId
+
+		annotation SummarizationSetBy = Automatic
+
+	column TemplateName
+		dataType: string
+		lineageTag: bfbff583-3f06-4f3f-883a-06dbd1277f87
+		summarizeBy: none
+		sourceColumn: TemplateName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 69e1c1a2-eba6-44af-8530-009d39fc02a6
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d13558ff-2b28-4ee3-b86e-61bcbd6ce5f6
+		summarizeBy: none
+		sourceColumn: CreatedDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column LastModifiedDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 676fd005-674a-4466-945f-71e9648c5b13
+		summarizeBy: none
+		sourceColumn: LastModifiedDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column OwnerName
+		dataType: string
+		lineageTag: 84e05d8f-4032-4b84-bf9e-0847b3ad9528
+		summarizeBy: none
+		sourceColumn: OwnerName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Shared
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 03135c34-1df2-42b8-ab5b-3a1e4d030e55
+		summarizeBy: none
+		sourceColumn: Shared
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 4dab4748-964f-49a4-87f9-984ba421b62b
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Total Templates' = COUNTROWS(Templates)
+		formatString: #,0
+		lineageTag: 94daac1f-5eb9-4031-ac88-53c83dcb3667
+
+	measure 'Shared Templates %' = DIVIDE(CALCULATE(COUNTROWS(Templates), Templates[Shared] = TRUE), COUNTROWS(Templates))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: f725f86b-6439-484c-a256-c8d9cf3ee3f9
+
+	partition Templates = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Data = Source{[Name="Templates"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

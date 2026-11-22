@@ -1,0 +1,79 @@
+table 'Envelope Documents'
+	lineageTag: 7b88b435-c4e8-4df9-877f-7fc740c2d9f8
+
+	column AccountId
+		dataType: string
+		lineageTag: 5fb3f398-c95d-4859-b02e-074216455302
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column EnvelopeId
+		dataType: string
+		lineageTag: d5a955b4-83aa-4428-a4b7-9643b4bde02c
+		summarizeBy: none
+		sourceColumn: EnvelopeId
+
+		annotation SummarizationSetBy = Automatic
+
+	column DocumentId
+		dataType: string
+		lineageTag: 40bd0164-094d-414d-9f06-f167a80300f7
+		summarizeBy: none
+		sourceColumn: DocumentId
+
+		annotation SummarizationSetBy = Automatic
+
+	column DocumentName
+		dataType: string
+		lineageTag: ec550ef5-0390-4070-b019-d59863606b83
+		summarizeBy: none
+		sourceColumn: DocumentName
+
+		annotation SummarizationSetBy = Automatic
+
+	column DocumentType
+		dataType: string
+		lineageTag: a3e70247-e47a-445c-878c-37ceb5e5da16
+		summarizeBy: none
+		sourceColumn: DocumentType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Order
+		dataType: double
+		lineageTag: 13f54ec4-e0a0-4574-a4a4-6b8cded9d6b3
+		summarizeBy: none
+		sourceColumn: Order
+
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Pages
+		dataType: double
+		lineageTag: 6b16dd59-bf7f-4439-a1e5-5bdbd72fa92a
+		summarizeBy: none
+		sourceColumn: Pages
+
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Documents' = COUNTROWS('Envelope Documents')
+		formatString: #,0
+		lineageTag: 19d4a2fd-0a90-4f55-9bd9-09024e28a0db
+
+	measure 'Avg Pages per Document' = AVERAGE('Envelope Documents'[Pages])
+		formatString: #,0.0
+		lineageTag: e037d6d8-08a7-4aa9-ba29-d05e2d6dc9ac
+
+	partition 'Envelope Documents' = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Data = Source{[Name="Envelope Documents"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

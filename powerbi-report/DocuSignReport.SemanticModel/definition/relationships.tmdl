@@ -1,0 +1,27 @@
+relationship 37170bb1-663e-4cbb-8e02-140a904be879
+	fromColumn: Recipients.EnvelopeId
+	toColumn: Envelopes.EnvelopeId
+
+relationship 77e215a2-d3cd-4a4d-9135-6c5b03105d62
+	fromColumn: 'Envelope Status'.EnvelopeId
+	toColumn: Envelopes.EnvelopeId
+
+relationship c0204bc6-f06e-4d9a-b55e-a9a38cb0051c
+	fromColumn: 'Envelope Custom Fields'.EnvelopeId
+	toColumn: Envelopes.EnvelopeId
+
+relationship 58d6ea30-c9b0-43f1-b591-2a66ed0fb55b
+	fromColumn: 'Envelope Audit Events'.EnvelopeId
+	toColumn: Envelopes.EnvelopeId
+
+relationship bdce8ed6-fa1b-42de-a27c-48a4c9a66edb
+	fromColumn: 'Envelope Documents'.EnvelopeId
+	toColumn: Envelopes.EnvelopeId
+
+relationship 6dd2ce8a-5df8-4d75-b2a2-dd546a428789
+	fromColumn: Envelopes.AccountId
+	toColumn: Accounts.AccountId
+
+relationship 5ed81fa4-b2a1-4c76-bc94-c9a76ababef6
+	fromColumn: Templates.AccountId
+	toColumn: Accounts.AccountId
