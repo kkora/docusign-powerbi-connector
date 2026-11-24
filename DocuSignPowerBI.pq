@@ -201,16 +201,19 @@ DocuSignPowerBIType = type function (
         Documentation.AllowedValues = {"Demo", "Production"}
     ]),
     optional fromDate as (type nullable text meta [
-        Documentation.FieldCaption = "From Date (optional)",
-        Documentation.FieldDescription = "Start date for envelope retrieval, YYYY-MM-DD. Defaults to 30 days ago if left blank."
+        Documentation.FieldCaption = "From Date",
+        Documentation.FieldDescription = "Start date for envelope retrieval, YYYY-MM-DD. Defaults to 30 days ago if left blank.",
+        Documentation.SampleValues = {"2024-01-01"}
     ]),
     optional toDate as (type nullable text meta [
-        Documentation.FieldCaption = "To Date (optional)",
-        Documentation.FieldDescription = "End date for envelope retrieval, YYYY-MM-DD. Defaults to now if left blank."
+        Documentation.FieldCaption = "To Date",
+        Documentation.FieldDescription = "End date for envelope retrieval, YYYY-MM-DD. Defaults to now if left blank.",
+        Documentation.SampleValues = {"2024-12-31"}
     ]),
     optional accountId as (type nullable text meta [
-        Documentation.FieldCaption = "Account ID (optional)",
-        Documentation.FieldDescription = "Explicit DocuSign account id, if you have access to more than one (see the Accounts table). Defaults to your default account if left blank."
+        Documentation.FieldCaption = "Account ID",
+        Documentation.FieldDescription = "Explicit DocuSign account id, if you have access to more than one (see the Accounts table). Defaults to your default account if left blank.",
+        Documentation.SampleValues = {"12345678-1234-1234-1234-123456789abc"}
     ])
 ) as table meta [
     Documentation.Name = "DocuSign eSignature",
