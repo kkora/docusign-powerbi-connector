@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "60fa0608",
   "position": {
     "x": 20,
     "y": 150,
     "z": 0,
-    "width": 580,
     "height": 550,
+    "width": 580,
     "tabOrder": 5
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "Envelopes.Status",
-              "nativeQueryRef": "Status"
+              "nativeQueryRef": "Status",
+              "active": true
             }
           ]
         },

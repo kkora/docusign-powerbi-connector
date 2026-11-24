@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "980839f5",
   "position": {
     "x": 260,
     "y": 150,
     "z": 0,
-    "width": 420,
     "height": 550,
+    "width": 420,
     "tabOrder": 3
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "Envelope Audit Events.Action",
-              "nativeQueryRef": "Action"
+              "nativeQueryRef": "Action",
+              "active": true
             }
           ]
         },

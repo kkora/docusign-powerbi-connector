@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "afeb9850",
   "position": {
     "x": 20,
     "y": 20,
     "z": 0,
-    "width": 220,
     "height": 680,
+    "width": 220,
     "tabOrder": 0
   },
   "visual": {
@@ -27,12 +27,12 @@
                 }
               },
               "queryRef": "Accounts.AccountName",
-              "nativeQueryRef": "AccountName"
+              "nativeQueryRef": "AccountName",
+              "active": true
             }
           ]
         }
       }
-    },
-    "objects": {}
+    }
   }
 }

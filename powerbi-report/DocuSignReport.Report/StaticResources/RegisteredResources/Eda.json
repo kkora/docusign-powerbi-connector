@@ -1,6 +1,15 @@
 {
   "name": "Eda",
-  "dataColors": ["#00608E", "#84BD00", "#E34948", "#2B6CB0", "#EDA100", "#4A7A00", "#E87BA4", "#4A3AA7"],
+  "dataColors": [
+    "#00608E",
+    "#84BD00",
+    "#E34948",
+    "#2B6CB0",
+    "#EDA100",
+    "#4A7A00",
+    "#E87BA4",
+    "#4A3AA7"
+  ],
   "background": "#FFFFFF",
   "foreground": "#112337",
   "tableAccent": "#00608E",
@@ -38,21 +47,33 @@
         "background": [
           {
             "show": true,
-            "color": { "solid": { "color": "#FFFFFF" } },
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
             "transparency": 0
           }
         ],
         "border": [
           {
             "show": true,
-            "color": { "solid": { "color": "#84BD00" } },
+            "color": {
+              "solid": {
+                "color": "#84BD00"
+              }
+            },
             "radius": 10
           }
         ],
         "dropShadow": [
           {
             "show": true,
-            "color": { "solid": { "color": "#00597C" } },
+            "color": {
+              "solid": {
+                "color": "#00597C"
+              }
+            },
             "position": "Outer",
             "preset": "BottomRight",
             "transparency": 88
@@ -61,7 +82,11 @@
         "title": [
           {
             "show": true,
-            "fontColor": { "solid": { "color": "#112337" } },
+            "fontColor": {
+              "solid": {
+                "color": "#112337"
+              }
+            },
             "fontSize": 12,
             "fontFamily": "Segoe UI Semibold",
             "alignment": "left"
@@ -73,13 +98,21 @@
       "*": {
         "background": [
           {
-            "color": { "solid": { "color": "#F6F8F3" } },
+            "color": {
+              "solid": {
+                "color": "#F6F8F3"
+              }
+            },
             "transparency": 0
           }
         ],
         "outspace": [
           {
-            "color": { "solid": { "color": "#EFF3EC" } },
+            "color": {
+              "solid": {
+                "color": "#EFF3EC"
+              }
+            },
             "transparency": 0
           }
         ]
