@@ -1,7 +1,7 @@
 table Accounts
 	lineageTag: 37cf2572-36d2-4da0-8ccb-741eeb54c909
 
-	measure 'Total Accounts' = COUNTROWS(Accounts)
+	measure 'Total Accounts' = COALESCE(COUNTROWS(Accounts), 0)
 		formatString: #,0
 		lineageTag: b34d7ce1-cdc0-4b26-bc10-be64da0a3679
 

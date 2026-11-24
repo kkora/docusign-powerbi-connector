@@ -1,11 +1,11 @@
 table 'Envelope Documents'
 	lineageTag: 7b88b435-c4e8-4df9-877f-7fc740c2d9f8
 
-	measure 'Total Documents' = COUNTROWS('Envelope Documents')
+	measure 'Total Documents' = COALESCE(COUNTROWS('Envelope Documents'), 0)
 		formatString: #,0
 		lineageTag: 19d4a2fd-0a90-4f55-9bd9-09024e28a0db
 
-	measure 'Avg Pages per Document' = AVERAGE('Envelope Documents'[Pages])
+	measure 'Avg Pages per Document' = COALESCE(AVERAGE('Envelope Documents'[Pages]), 0)
 		formatString: #,0.0
 		lineageTag: e037d6d8-08a7-4aa9-ba29-d05e2d6dc9ac
 

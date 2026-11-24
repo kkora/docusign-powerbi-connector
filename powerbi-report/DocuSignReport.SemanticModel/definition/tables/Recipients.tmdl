@@ -1,19 +1,19 @@
 table Recipients
 	lineageTag: 65640913-4005-413a-abc9-0ae410601d4a
 
-	measure 'Total Recipients' = COUNTROWS(Recipients)
+	measure 'Total Recipients' = COALESCE(COUNTROWS(Recipients), 0)
 		formatString: #,0
 		lineageTag: 24cffc22-f0ce-4559-97a6-dd04cad1730b
 
-	measure 'Declined Recipients' = CALCULATE(COUNTROWS(Recipients), Recipients[DeclineReason] <> BLANK())
+	measure 'Declined Recipients' = COALESCE(CALCULATE(COUNTROWS(Recipients), Recipients[DeclineReason] <> BLANK()), 0)
 		formatString: #,0
 		lineageTag: 1c8b1247-9568-47bf-af6a-d43529778e43
 
-	measure 'Avg Recipient Turnaround Hours' = AVERAGE(Recipients[CompletionHours])
+	measure 'Avg Recipient Turnaround Hours' = COALESCE(AVERAGE(Recipients[CompletionHours]), 0)
 		formatString: #,0.0
 		lineageTag: fb93a33b-9f4e-4342-92ee-c1de7f3f552d
 
-	measure 'Distinct Authentication Methods' = DISTINCTCOUNT(Recipients[AuthenticationMethod])
+	measure 'Distinct Authentication Methods' = COALESCE(DISTINCTCOUNT(Recipients[AuthenticationMethod]), 0)
 		formatString: #,0
 		lineageTag: 7f7e8831-c598-4c1c-b332-f89dfcf3f337
 

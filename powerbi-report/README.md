@@ -14,6 +14,23 @@ The originally hand-authored files needed three fixes before Desktop would load 
 
 The visual-by-visual guide below is kept as reference documentation of the report's content; it is no longer needed as a fallback.
 
+## Theming & screenshots
+
+Two custom themes are registered under `DocuSignReport.Report/StaticResources/RegisteredResources/`; the active one is set in `report.json` → `themeCollection.customTheme`:
+
+- **`Eda.json`** (active) — NJEDA-branded: teal `#00608E` (brand `#00597c`, minimally saturation-adjusted to pass color validation) and apple green `#84BD00` lead the CVD-validated 8-color palette; navy `#112337` ink; green card borders on white surfaces over a faint green-white page plane.
+- **`DocuSignModern.json`** — neutral blue-led variant of the same design (swap by changing the `customTheme` name in `report.json`).
+
+All measures are wrapped in `COALESCE(..., 0)` so slicer selections that filter a table to zero rows show a readable `0` instead of `(Blank)`.
+
+Rendered in Power BI Desktop (2026-11-24, live Demo-account data):
+
+| Page | Screenshot |
+|---|---|
+| Overview | [screenshots/overview.png](screenshots/overview.png) |
+| Recipients & Audit | [screenshots/recipients-audit.png](screenshots/recipients-audit.png) |
+| Templates, Custom Fields & Accounts | [screenshots/templates-custom-fields-accounts.png](screenshots/templates-custom-fields-accounts.png) |
+
 ## Prerequisites
 
 - Power BI Desktop from 2024 or later (`.pbip`/PBIR support is GA — recent builds have no preview toggle for it; only enable the Preview-features option if your build still lists one).

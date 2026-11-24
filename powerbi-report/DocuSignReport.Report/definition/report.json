@@ -8,7 +8,7 @@
       "type": "SharedResources"
     },
     "customTheme": {
-      "name": "DocuSignModern",
+      "name": "Eda",
       "reportVersionAtImport": "5.55",
       "type": "RegisteredResources"
     }
@@ -22,6 +22,11 @@
         {
           "name": "DocuSignModern",
           "path": "DocuSignModern.json",
+          "type": "CustomTheme"
+        },
+        {
+          "name": "Eda",
+          "path": "Eda.json",
           "type": "CustomTheme"
         }
       ]

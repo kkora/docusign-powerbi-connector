@@ -1,11 +1,11 @@
 table Templates
 	lineageTag: d72e25f6-43da-4617-80f3-7649d090c522
 
-	measure 'Total Templates' = COUNTROWS(Templates)
+	measure 'Total Templates' = COALESCE(COUNTROWS(Templates), 0)
 		formatString: #,0
 		lineageTag: 94daac1f-5eb9-4031-ac88-53c83dcb3667
 
-	measure 'Shared Templates %' = DIVIDE(CALCULATE(COUNTROWS(Templates), Templates[Shared] = TRUE), COUNTROWS(Templates))
+	measure 'Shared Templates %' = COALESCE(DIVIDE(CALCULATE(COUNTROWS(Templates), Templates[Shared] = TRUE), COUNTROWS(Templates)), 0)
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: f725f86b-6439-484c-a256-c8d9cf3ee3f9
 

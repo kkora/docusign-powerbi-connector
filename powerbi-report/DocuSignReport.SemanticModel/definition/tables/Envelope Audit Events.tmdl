@@ -1,11 +1,11 @@
 table 'Envelope Audit Events'
 	lineageTag: c430e2f0-9994-471b-ad9b-dca23b07169e
 
-	measure 'Total Audit Events' = COUNTROWS('Envelope Audit Events')
+	measure 'Total Audit Events' = COALESCE(COUNTROWS('Envelope Audit Events'), 0)
 		formatString: #,0
 		lineageTag: 75d6f947-ed63-47be-a12a-3da9bb313f24
 
-	measure 'Distinct Event Actions' = DISTINCTCOUNT('Envelope Audit Events'[Action])
+	measure 'Distinct Event Actions' = COALESCE(DISTINCTCOUNT('Envelope Audit Events'[Action]), 0)
 		formatString: #,0
 		lineageTag: d09fb66e-ed77-4076-ad48-10cc8a1337ae
 

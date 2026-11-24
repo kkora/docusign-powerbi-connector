@@ -1,19 +1,19 @@
 table 'Envelope Status'
 	lineageTag: be3aaa10-9c75-4310-ad8a-8650e3f52315
 
-	measure 'Avg Completion Hours' = AVERAGE('Envelope Status'[CompletionHours])
+	measure 'Avg Completion Hours' = COALESCE(AVERAGE('Envelope Status'[CompletionHours]), 0)
 		formatString: #,0.0
 		lineageTag: 6a25695c-5493-41c2-95df-abfea16fa23b
 
-	measure 'Completed %' = DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsCompleted] = TRUE), COUNTROWS('Envelope Status'))
+	measure 'Completed %' = COALESCE(DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsCompleted] = TRUE), COUNTROWS('Envelope Status')), 0)
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 60c0f09f-c9d6-4adc-a987-957c7348e2ae
 
-	measure 'Pending %' = DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsPending] = TRUE), COUNTROWS('Envelope Status'))
+	measure 'Pending %' = COALESCE(DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsPending] = TRUE), COUNTROWS('Envelope Status')), 0)
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: a5fe07bc-0027-4d2a-899d-2a88ae6f468e
 
-	measure 'Voided %' = DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsVoided] = TRUE), COUNTROWS('Envelope Status'))
+	measure 'Voided %' = COALESCE(DIVIDE(CALCULATE(COUNTROWS('Envelope Status'), 'Envelope Status'[IsVoided] = TRUE), COUNTROWS('Envelope Status')), 0)
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 6448519d-8ddb-4afd-a715-d57e041f94bc
 
