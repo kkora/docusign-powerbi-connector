@@ -90,6 +90,20 @@ PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration\
 
 OAuth connectors on gateways have real constraints (token refresh must succeed unattended, and some tenants restrict custom connectors by policy) — confirm with your gateway admin before relying on this for production refresh.
 
+## Distributing this connector to another org
+
+This connector uses a **single shared Integration Key** (Model A: the key identifies the app, not the customer — the same pattern certified connectors like Salesforce/ServiceNow use). A different org can use it with their own DocuSign data with **no code changes**:
+
+1. Copy the same `DocuSignPowerBI.mez` to their machine and follow the Desktop installation steps above.
+2. They sign in with **their own** DocuSign login, not yours — DocuSign's `/oauth/userinfo` only returns accounts that login has access to, so there's no cross-org data mixing.
+3. They'll see an OAuth consent screen for this app (by its registered name) and need to approve it, since it's a third-party app from their tenant's perspective.
+4. For **scheduled refresh in Power BI Service**, they need their **own on-premises data gateway** — this is mandatory for any uncertified custom connector (Power BI Service can't run one directly in the cloud) and can't be shared across orgs. Same gateway steps as above, done on their own gateway machine.
+
+Two things that don't change with the org, and are worth confirming before distributing:
+
+- **Demo works for anyone immediately; Production does not.** DocuSign's Demo environment has no consent gate. For another org's **Production** DocuSign data, this Integration Key needs DocuSign's one-time "Go-Live" review first (done once by the key owner, not per customer).
+- If an org's security policy won't allow consenting to a third-party-owned app, the alternative is a "bring-your-own-key" design (`integrationKey` as a required connection parameter, so each org registers their own Integration Key) — not currently implemented; would need `StartLogin`/`FinishLogin`/`Refresh` to recover it from `dataSourcePath` the same defensive way `environment` is recovered today.
+
 ## Known limitations
 
 See "Known limitations" in [TEST-RESULTS.md](TEST-RESULTS.md) — in short: the `Production` DocuSign environment is implemented identically to `Demo` and the `Demo` OAuth path is now live-verified, but `Production` has not been exercised against a live tenant; and 429/5xx retry recovery is proven via the bounded-retry-then-fail path, not a "fails then succeeds" path (not expressible with PQTest's stateless HTTP mock server).
