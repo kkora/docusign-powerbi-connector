@@ -15,8 +15,11 @@
   In DocuSign Admin, on the "Docusign Power Bi Connector" Integration Key,
   add a second Redirect URI (in addition to the Power BI one):
       http://localhost:8912/
-  App Type should be "Native OS Application" with
-  "Authorization Code Grant with Proof Key for Code Exchange (PKCE)".
+  Leave the App Type as "Single-Page Web Application" with
+  "Authorization Code Grant with Proof Key for Code Exchange (PKCE)" and
+  CORS enabled for https://oauth.powerbi.com - that is what the Power BI
+  connector requires, and this script sends a matching Origin header on the
+  token exchange to satisfy DocuSign's CORS validation.
 
 .PARAMETER SignerEmail
   Your own email address - used as the signer/recipient on all three test
@@ -24,6 +27,14 @@
 
 .PARAMETER SignerName
   Your display name as it should appear on the signed document.
+
+.PARAMETER TemplateId
+  Reuse an existing template (e.g. from an earlier partial run) instead of
+  creating a new one.
+
+.PARAMETER SkipCompleted
+  Skip envelope #1 (the interactive signing step) - useful when resuming a
+  run that already produced a completed envelope.
 
 .EXAMPLE
   .\seed-docusign-data.ps1 -SignerEmail "you@yourcompany.com" -SignerName "Kanchan Kora"
@@ -33,6 +44,8 @@ param(
     [Parameter(Mandatory = $true)][string]$SignerEmail,
     [Parameter(Mandatory = $true)][string]$SignerName,
     [string]$ClientId = "226dd43b-4b8e-488a-9ba8-ac205c100833",
+    [string]$TemplateId,
+    [switch]$SkipCompleted,
     [string]$AuthHost = "https://account-d.docusign.com",
     [int]$CallbackPort = 8912
 )
@@ -74,14 +87,26 @@ function Start-InteractiveLogin {
     Start-Process $authUrl
 
     Write-Host "Waiting for you to log in and approve access (listening on $RedirectUri)..." -ForegroundColor Cyan
-    $context = $listener.GetContext()
-    $query = [System.Web.HttpUtility]::ParseQueryString($context.Request.Url.Query)
 
-    $responseHtml = "<html><body><h2>Login captured. You can close this tab and return to the terminal.</h2></body></html>"
-    $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseHtml)
-    $context.Response.ContentLength64 = $buffer.Length
-    $context.Response.OutputStream.Write($buffer, 0, $buffer.Length)
-    $context.Response.OutputStream.Close()
+    # Browsers can hit the listener with stray requests (favicon.ico, prefetch
+    # probes) before the real OAuth redirect arrives. Keep answering until we
+    # see a request that actually carries a code or error parameter.
+    while ($true) {
+        $context = $listener.GetContext()
+        $query = [System.Web.HttpUtility]::ParseQueryString($context.Request.Url.Query)
+
+        if ($query["code"] -or $query["error"]) {
+            $responseHtml = "<html><body><h2>Login captured. You can close this tab and return to the terminal.</h2></body></html>"
+            $buffer = [System.Text.Encoding]::UTF8.GetBytes($responseHtml)
+            $context.Response.ContentLength64 = $buffer.Length
+            $context.Response.OutputStream.Write($buffer, 0, $buffer.Length)
+            $context.Response.OutputStream.Close()
+            break
+        }
+
+        $context.Response.StatusCode = 404
+        $context.Response.OutputStream.Close()
+    }
     $listener.Stop()
 
     if ($query["error"]) {
@@ -108,9 +133,45 @@ $tokenBody = @{
     redirect_uri  = $RedirectUri
     client_id     = $ClientId
 }
-$token = Invoke-RestMethod -Method Post -Uri "$AuthHost/oauth/token" -Body $tokenBody -ContentType "application/x-www-form-urlencoded"
+# The Integration Key is configured as a Single-Page Web Application with CORS,
+# so DocuSign requires an Origin header matching a registered CORS origin on
+# the token exchange (otherwise: invalid_grant / origin_required_but_not_included).
+$token = Invoke-RestMethod -Method Post -Uri "$AuthHost/oauth/token" -Body $tokenBody -ContentType "application/x-www-form-urlencoded" -Headers @{ Origin = "https://oauth.powerbi.com" }
 $accessToken = $token.access_token
 $headers = @{ Authorization = "Bearer $accessToken" }
+
+# PS 5.1's HttpWebRequest reuses pooled keep-alive connections; after a long
+# pause (e.g. while the user signs in the browser) the server side has already
+# closed them and the next call fails with "connection that was expected to be
+# kept alive was closed by the server". Retrying opens a fresh connection.
+function Invoke-DsApi {
+    param([string]$Method, [string]$Uri, [string]$Body)
+
+    $retryable = @(
+        [System.Net.WebExceptionStatus]::KeepAliveFailure
+        [System.Net.WebExceptionStatus]::ConnectionClosed
+        [System.Net.WebExceptionStatus]::ReceiveFailure
+        [System.Net.WebExceptionStatus]::SendFailure
+    )
+    $attempt = 0
+    while ($true) {
+        $attempt++
+        try {
+            if ($Body) {
+                return Invoke-RestMethod -Method $Method -Uri $Uri -Headers $headers -Body $Body -ContentType "application/json"
+            }
+            return Invoke-RestMethod -Method $Method -Uri $Uri -Headers $headers
+        }
+        catch [System.Net.WebException] {
+            if ($attempt -lt 3 -and $retryable -contains $_.Exception.Status) {
+                Write-Host "Transient connection error ($($_.Exception.Status)) - retrying..." -ForegroundColor DarkYellow
+                Start-Sleep -Seconds 1
+                continue
+            }
+            throw
+        }
+    }
+}
 
 Write-Host "=== Step 3: Account discovery ===" -ForegroundColor Yellow
 $userInfo = Invoke-RestMethod -Method Get -Uri "$AuthHost/oauth/userinfo" -Headers $headers
@@ -157,9 +218,14 @@ $templateBody = @{
     status      = "created"
 } | ConvertTo-Json -Depth 10
 
-$template = Invoke-RestMethod -Method Post -Uri "$apiBase/templates" -Headers $headers -Body $templateBody -ContentType "application/json"
-$templateId = $template.templateId
-Write-Host "Template created: $templateId" -ForegroundColor Green
+if ($TemplateId) {
+    Write-Host "Reusing existing template: $TemplateId" -ForegroundColor Green
+}
+else {
+    $template = Invoke-DsApi -Method Post -Uri "$apiBase/templates" -Body $templateBody
+    $TemplateId = $template.templateId
+    Write-Host "Template created: $TemplateId" -ForegroundColor Green
+}
 
 function New-EnvelopeFromTemplate {
     param([string]$Status, [string]$EmailSubjectSuffix, [switch]$Embedded)
@@ -179,7 +245,7 @@ function New-EnvelopeFromTemplate {
         emailSubject    = "PBI Test Envelope - $EmailSubjectSuffix"
     } | ConvertTo-Json -Depth 10
 
-    $envelope = Invoke-RestMethod -Method Post -Uri "$apiBase/envelopes" -Headers $headers -Body $envelopeBody -ContentType "application/json"
+    $envelope = Invoke-DsApi -Method Post -Uri "$apiBase/envelopes" -Body $envelopeBody
 
     if ($Embedded) {
         $viewBody = @{
@@ -189,18 +255,23 @@ function New-EnvelopeFromTemplate {
             userName      = $SignerName
             clientUserId  = $clientUserId
         } | ConvertTo-Json
-        $view = Invoke-RestMethod -Method Post -Uri "$apiBase/envelopes/$($envelope.envelopeId)/views/recipient" -Headers $headers -Body $viewBody -ContentType "application/json"
+        $view = Invoke-DsApi -Method Post -Uri "$apiBase/envelopes/$($envelope.envelopeId)/views/recipient" -Body $viewBody
         return @{ EnvelopeId = $envelope.envelopeId; SigningUrl = $view.url }
     }
     return @{ EnvelopeId = $envelope.envelopeId; SigningUrl = $null }
 }
 
-Write-Host "=== Step 5: Creating envelope #1 - to be signed now (will become 'completed') ===" -ForegroundColor Yellow
-$completedEnvelope = New-EnvelopeFromTemplate -Status "sent" -EmailSubjectSuffix "Completed" -Embedded
-Write-Host "Opening the signing ceremony in your browser - please click through and sign it." -ForegroundColor Cyan
-Start-Process $completedEnvelope.SigningUrl
-Write-Host "Press Enter once you've finished signing in the browser..." -ForegroundColor Cyan
-Read-Host | Out-Null
+if ($SkipCompleted) {
+    Write-Host "=== Step 5: Skipped (envelope #1 already completed in an earlier run) ===" -ForegroundColor Yellow
+}
+else {
+    Write-Host "=== Step 5: Creating envelope #1 - to be signed now (will become 'completed') ===" -ForegroundColor Yellow
+    $completedEnvelope = New-EnvelopeFromTemplate -Status "sent" -EmailSubjectSuffix "Completed" -Embedded
+    Write-Host "Opening the signing ceremony in your browser - please click through and sign it." -ForegroundColor Cyan
+    Start-Process $completedEnvelope.SigningUrl
+    Write-Host "Press Enter once you've finished signing in the browser..." -ForegroundColor Cyan
+    Read-Host | Out-Null
+}
 
 Write-Host "=== Step 6: Creating envelope #2 - left as 'sent' (stays pending) ===" -ForegroundColor Yellow
 $pendingEnvelope = New-EnvelopeFromTemplate -Status "sent" -EmailSubjectSuffix "Pending"
@@ -209,7 +280,7 @@ Write-Host "Envelope created and sent: $($pendingEnvelope.EnvelopeId) (check you
 Write-Host "=== Step 7: Creating envelope #3 and voiding it ===" -ForegroundColor Yellow
 $voidEnvelope = New-EnvelopeFromTemplate -Status "sent" -EmailSubjectSuffix "Voided"
 $voidBody = @{ status = "voided"; voidedReason = "Test void for Power BI validation" } | ConvertTo-Json
-Invoke-RestMethod -Method Put -Uri "$apiBase/envelopes/$($voidEnvelope.EnvelopeId)" -Headers $headers -Body $voidBody -ContentType "application/json" | Out-Null
+Invoke-DsApi -Method Put -Uri "$apiBase/envelopes/$($voidEnvelope.EnvelopeId)" -Body $voidBody | Out-Null
 Write-Host "Envelope voided: $($voidEnvelope.EnvelopeId)" -ForegroundColor Green
 
 Write-Host ""
