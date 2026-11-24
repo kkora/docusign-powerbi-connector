@@ -1,6 +1,22 @@
 table Recipients
 	lineageTag: 65640913-4005-413a-abc9-0ae410601d4a
 
+	measure 'Total Recipients' = COUNTROWS(Recipients)
+		formatString: #,0
+		lineageTag: 24cffc22-f0ce-4559-97a6-dd04cad1730b
+
+	measure 'Declined Recipients' = CALCULATE(COUNTROWS(Recipients), Recipients[DeclineReason] <> BLANK())
+		formatString: #,0
+		lineageTag: 1c8b1247-9568-47bf-af6a-d43529778e43
+
+	measure 'Avg Recipient Turnaround Hours' = AVERAGE(Recipients[CompletionHours])
+		formatString: #,0.0
+		lineageTag: fb93a33b-9f4e-4342-92ee-c1de7f3f552d
+
+	measure 'Distinct Authentication Methods' = DISTINCTCOUNT(Recipients[AuthenticationMethod])
+		formatString: #,0
+		lineageTag: 7f7e8831-c598-4c1c-b332-f89dfcf3f337
+
 	column AccountId
 		dataType: string
 		lineageTag: f6f8a1e7-5552-4491-93b5-2abd15034939
@@ -64,6 +80,7 @@ table Recipients
 		sourceColumn: RoutingOrder
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column RecipientStatus
@@ -133,23 +150,8 @@ table Recipients
 		sourceColumn: CompletionHours
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'Total Recipients' = COUNTROWS(Recipients)
-		formatString: #,0
-		lineageTag: 24cffc22-f0ce-4559-97a6-dd04cad1730b
-
-	measure 'Declined Recipients' = CALCULATE(COUNTROWS(Recipients), Recipients[DeclineReason] <> BLANK())
-		formatString: #,0
-		lineageTag: 1c8b1247-9568-47bf-af6a-d43529778e43
-
-	measure 'Avg Recipient Turnaround Hours' = AVERAGE(Recipients[CompletionHours])
-		formatString: #,0.0
-		lineageTag: fb93a33b-9f4e-4342-92ee-c1de7f3f552d
-
-	measure 'Distinct Authentication Methods' = DISTINCTCOUNT(Recipients[AuthenticationMethod])
-		formatString: #,0
-		lineageTag: 7f7e8831-c598-4c1c-b332-f89dfcf3f337
 
 	partition Recipients = m
 		mode: import
@@ -161,3 +163,4 @@ table Recipients
 				    Data
 
 	annotation PBI_ResultType = Table
+

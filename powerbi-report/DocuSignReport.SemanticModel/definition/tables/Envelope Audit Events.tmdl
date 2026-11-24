@@ -1,6 +1,14 @@
 table 'Envelope Audit Events'
 	lineageTag: c430e2f0-9994-471b-ad9b-dca23b07169e
 
+	measure 'Total Audit Events' = COUNTROWS('Envelope Audit Events')
+		formatString: #,0
+		lineageTag: 75d6f947-ed63-47be-a12a-3da9bb313f24
+
+	measure 'Distinct Event Actions' = DISTINCTCOUNT('Envelope Audit Events'[Action])
+		formatString: #,0
+		lineageTag: d09fb66e-ed77-4076-ad48-10cc8a1337ae
+
 	column AccountId
 		dataType: string
 		lineageTag: 36424a27-b4c4-4bef-a36c-93c2aec045ad
@@ -82,14 +90,6 @@ table 'Envelope Audit Events'
 
 		annotation SummarizationSetBy = Automatic
 
-	measure 'Total Audit Events' = COUNTROWS('Envelope Audit Events')
-		formatString: #,0
-		lineageTag: 75d6f947-ed63-47be-a12a-3da9bb313f24
-
-	measure 'Distinct Event Actions' = DISTINCTCOUNT('Envelope Audit Events'[Action])
-		formatString: #,0
-		lineageTag: d09fb66e-ed77-4076-ad48-10cc8a1337ae
-
 	partition 'Envelope Audit Events' = m
 		mode: import
 		source =
@@ -100,3 +100,4 @@ table 'Envelope Audit Events'
 				    Data
 
 	annotation PBI_ResultType = Table
+

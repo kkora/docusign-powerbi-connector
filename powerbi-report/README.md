@@ -2,15 +2,21 @@
 
 A Power BI Project (`.pbip`) built on top of the `DocuSignPowerBI` connector, covering all 8 Navigator tables: Envelopes, Recipients, Envelope Status, Envelope Custom Fields, Envelope Audit Events, Templates, Envelope Documents, Accounts.
 
-## Confidence / honesty note
+## Verification status
 
-The **semantic model** (`DocuSignReport.SemanticModel/` — tables, relationships, M partitions, 21 DAX measures, all hand-authored as TMDL text) is high-confidence: TMDL is a stable, well-documented format and every table/column/measure here maps directly to the connector's actual, tested schema.
+**Verified working in Power BI Desktop 2.159 (October 2026) on 2026-11-24**: the `.pbip` opens, the semantic model loads all 8 tables, and the report renders all 3 pages / 17 visuals with data matching the live Demo account (2 envelopes, 1 template, 2 accounts — same counts as the connector's live verification in [TEST-RESULTS.md](../TEST-RESULTS.md)).
 
-The **report** (`DocuSignReport.Report/` — 3 pages, 17 visuals) was hand-authored against the current Power BI enhanced report format (PBIR) from documentation and prior examples, but **could not be opened or rendered to verify it** (no Power BI Desktop available in this environment). All JSON files are syntactically valid (parsed successfully), but that doesn't guarantee they satisfy Power BI Desktop's full schema validation. **If the report fails to open or Desktop offers to "repair" it:** the semantic model will still load correctly on its own — open the `.pbip`, let Desktop rebuild/discard the broken report shell if prompted, then recreate the 3 pages using the visual-by-visual guide below (10-15 minutes).
+The originally hand-authored files needed three fixes before Desktop would load them — all defects a static JSON/TMDL syntax check can't catch, discovered by actually opening the project:
+
+1. **`DocuSignReport.Report/definition/version.json` was missing.** It is a required PBIR file, and its `version` must be `"2.0.0"` — declaring a higher version (e.g. `2.1.0`) makes Desktop open the project but silently load **zero pages** (no error, no tabs, blank canvas).
+2. **`report.json` was missing the required `themeCollection` property** (an empty `{}` satisfies the schema). Without it, Desktop discards the entire PBIR `definition/` folder on open and replaces it with a blank legacy `report.json` — recoverable only from source control.
+3. **`database.tmdl` had a de-indented property** (`compatibilityLevel` at column 0 instead of tabbed under the `database` object), which TMDL's parser rejects outright.
+
+The visual-by-visual guide below is kept as reference documentation of the report's content; it is no longer needed as a fallback.
 
 ## Prerequisites
 
-- Enable **Power BI Project (.pbip) save option** under File → Options and settings → Options → Preview features (if not already on).
+- Power BI Desktop from 2024 or later (`.pbip`/PBIR support is GA — recent builds have no preview toggle for it; only enable the Preview-features option if your build still lists one).
 - The `DocuSignPowerBI.mez` connector must be installed in your Custom Connectors folder (see the main [README](../README.md)) and trusted (unsigned extension loading enabled).
 
 ## Opening it
@@ -46,7 +52,7 @@ The **report** (`DocuSignReport.Report/` — 3 pages, 17 visuals) was hand-autho
 | Envelope Documents | Total Documents, Avg Pages per Document |
 | Accounts | Total Accounts |
 
-## Manual build guide (fallback, if the report pages don't open)
+## Page/visual reference
 
 ### Page 1 — Overview
 - 5 **Card** visuals: `Envelopes[Total Envelopes]`, `Envelope Status[Completed %]`, `Envelope Status[Avg Completion Hours]`, `Templates[Total Templates]`, `Accounts[Total Accounts]`.

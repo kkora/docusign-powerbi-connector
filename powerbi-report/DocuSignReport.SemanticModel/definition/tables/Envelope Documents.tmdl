@@ -1,6 +1,14 @@
 table 'Envelope Documents'
 	lineageTag: 7b88b435-c4e8-4df9-877f-7fc740c2d9f8
 
+	measure 'Total Documents' = COUNTROWS('Envelope Documents')
+		formatString: #,0
+		lineageTag: 19d4a2fd-0a90-4f55-9bd9-09024e28a0db
+
+	measure 'Avg Pages per Document' = AVERAGE('Envelope Documents'[Pages])
+		formatString: #,0.0
+		lineageTag: e037d6d8-08a7-4aa9-ba29-d05e2d6dc9ac
+
 	column AccountId
 		dataType: string
 		lineageTag: 5fb3f398-c95d-4859-b02e-074216455302
@@ -48,6 +56,7 @@ table 'Envelope Documents'
 		sourceColumn: Order
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column Pages
@@ -57,15 +66,8 @@ table 'Envelope Documents'
 		sourceColumn: Pages
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	measure 'Total Documents' = COUNTROWS('Envelope Documents')
-		formatString: #,0
-		lineageTag: 19d4a2fd-0a90-4f55-9bd9-09024e28a0db
-
-	measure 'Avg Pages per Document' = AVERAGE('Envelope Documents'[Pages])
-		formatString: #,0.0
-		lineageTag: e037d6d8-08a7-4aa9-ba29-d05e2d6dc9ac
 
 	partition 'Envelope Documents' = m
 		mode: import
@@ -77,3 +79,4 @@ table 'Envelope Documents'
 				    Data
 
 	annotation PBI_ResultType = Table
+

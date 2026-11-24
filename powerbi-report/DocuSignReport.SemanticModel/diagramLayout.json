@@ -1,0 +1,126 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 334.21462368095894,
+            "y": 203.31237143650787
+          },
+          "nodeIndex": "Accounts",
+          "nodeLineageTag": "37cf2572-36d2-4da0-8ccb-741eeb54c909",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 334.30626372492839,
+            "y": 562.71723760246607
+          },
+          "nodeIndex": "Envelope Audit Events",
+          "nodeLineageTag": "c430e2f0-9994-471b-ad9b-dca23b07169e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 991.47930523406512,
+            "y": 89.065518439430662
+          },
+          "nodeIndex": "Envelope Custom Fields",
+          "nodeLineageTag": "7ff35fe7-f4fa-44ba-b0fc-b496995d748c",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 685.37344796848288,
+            "y": 657.48740469279846
+          },
+          "nodeIndex": "Envelope Documents",
+          "nodeLineageTag": "7b88b435-c4e8-4df9-877f-7fc740c2d9f8",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 972.39760318537981,
+            "y": 438.79554761976976
+          },
+          "nodeIndex": "Envelope Status",
+          "nodeLineageTag": "be3aaa10-9c75-4310-ad8a-8650e3f52315",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 621.32074118026,
+            "y": 303.7479393407541
+          },
+          "nodeIndex": "Envelopes",
+          "nodeLineageTag": "e8a9d04f-2823-4ddd-988c-1e60f996f2bc",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 683.19802888732511,
+            "y": -50
+          },
+          "nodeIndex": "Recipients",
+          "nodeLineageTag": "65640913-4005-413a-abc9-0ae410601d4a",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": -3.9320454146375141
+          },
+          "nodeIndex": "Templates",
+          "nodeLineageTag": "d72e25f6-43da-4617-80f3-7649d090c522",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

@@ -1,6 +1,14 @@
 table 'Envelope Custom Fields'
 	lineageTag: 7ff35fe7-f4fa-44ba-b0fc-b496995d748c
 
+	measure 'Total Custom Fields' = COUNTROWS('Envelope Custom Fields')
+		formatString: #,0
+		lineageTag: c50fed5e-cdaf-4f50-9be6-1252cb867176
+
+	measure 'Required Fields Not Shown' = CALCULATE(COUNTROWS('Envelope Custom Fields'), 'Envelope Custom Fields'[Required] = TRUE, 'Envelope Custom Fields'[Show] = FALSE)
+		formatString: #,0
+		lineageTag: f7465271-b06a-4723-b9b4-141b44171cdc
+
 	column AccountId
 		dataType: string
 		lineageTag: 071b4352-93f7-4421-9741-9405d368e36e
@@ -59,14 +67,6 @@ table 'Envelope Custom Fields'
 
 		annotation SummarizationSetBy = Automatic
 
-	measure 'Total Custom Fields' = COUNTROWS('Envelope Custom Fields')
-		formatString: #,0
-		lineageTag: c50fed5e-cdaf-4f50-9be6-1252cb867176
-
-	measure 'Required Fields Not Shown' = CALCULATE(COUNTROWS('Envelope Custom Fields'), 'Envelope Custom Fields'[Required] = TRUE, 'Envelope Custom Fields'[Show] = FALSE)
-		formatString: #,0
-		lineageTag: f7465271-b06a-4723-b9b4-141b44171cdc
-
 	partition 'Envelope Custom Fields' = m
 		mode: import
 		source =
@@ -77,3 +77,4 @@ table 'Envelope Custom Fields'
 				    Data
 
 	annotation PBI_ResultType = Table
+

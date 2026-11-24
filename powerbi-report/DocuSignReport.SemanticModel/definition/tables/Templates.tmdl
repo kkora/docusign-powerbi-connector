@@ -1,6 +1,14 @@
 table Templates
 	lineageTag: d72e25f6-43da-4617-80f3-7649d090c522
 
+	measure 'Total Templates' = COUNTROWS(Templates)
+		formatString: #,0
+		lineageTag: 94daac1f-5eb9-4031-ac88-53c83dcb3667
+
+	measure 'Shared Templates %' = DIVIDE(CALCULATE(COUNTROWS(Templates), Templates[Shared] = TRUE), COUNTROWS(Templates))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: f725f86b-6439-484c-a256-c8d9cf3ee3f9
+
 	column AccountId
 		dataType: string
 		lineageTag: 7a07fce7-7cb2-4a69-a01b-def50568388b
@@ -76,14 +84,6 @@ table Templates
 
 		annotation SummarizationSetBy = Automatic
 
-	measure 'Total Templates' = COUNTROWS(Templates)
-		formatString: #,0
-		lineageTag: 94daac1f-5eb9-4031-ac88-53c83dcb3667
-
-	measure 'Shared Templates %' = DIVIDE(CALCULATE(COUNTROWS(Templates), Templates[Shared] = TRUE), COUNTROWS(Templates))
-		formatString: 0.0%;-0.0%;0.0%
-		lineageTag: f725f86b-6439-484c-a256-c8d9cf3ee3f9
-
 	partition Templates = m
 		mode: import
 		source =
@@ -94,3 +94,4 @@ table Templates
 				    Data
 
 	annotation PBI_ResultType = Table
+

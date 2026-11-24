@@ -49,6 +49,10 @@ This is real evidence that OAuth PKCE, account discovery, envelope pagination, a
 
 A full automated-suite rerun (`run-test` against `test/unit` and `test/integration`) after these three fixes confirmed all 138 mocked Facts still pass unchanged.
 
+### Power BI Desktop `.pbip` verification (2026-11-24)
+
+The bundled Power BI Project (`powerbi-report/DocuSignReport.pbip`) was opened in **Power BI Desktop 2.159.1231.0 (October 2026)** on a real machine: the semantic model loaded all 8 tables, and the report rendered all 3 pages / 17 visuals with data matching this live account (2 envelopes / 1 template / 2 accounts — the same counts as the table above), which requires Desktop's own OAuth sign-in and refresh path to have succeeded. This substantially unblocks what PBI-07/PBI-08 describe: Desktop's WebView OAuth dialog and Desktop-driven data load have now both been exercised against the live Demo tenant via the `.pbip` (the connector-only Navigator flow through Desktop's Get Data UI remains unexercised, but runs the identical code path). Getting the hand-authored PBIR/TMDL files to load required three fixes documented in [powerbi-report/README.md](powerbi-report/README.md) ("Verification status") — notably that PBIR's required `version.json` must declare version `2.0.0`, where a higher value makes Desktop silently load an empty report.
+
 ## New feature tests (F01–F10)
 
 | ID | Feature | Result | Evidence |

@@ -1,6 +1,22 @@
 table Envelopes
 	lineageTag: e8a9d04f-2823-4ddd-988c-1e60f996f2bc
 
+	measure 'Total Envelopes' = COUNTROWS(Envelopes)
+		formatString: #,0
+		lineageTag: 870409aa-af67-47c5-b415-b0ec73fb32af
+
+	measure 'Completed Envelopes' = CALCULATE(COUNTROWS(Envelopes), Envelopes[Status] = "completed")
+		formatString: #,0
+		lineageTag: 0feae085-acaa-451e-b16b-763063f5860f
+
+	measure 'Voided Envelopes' = CALCULATE(COUNTROWS(Envelopes), Envelopes[Status] = "voided")
+		formatString: #,0
+		lineageTag: 101a8ee1-57d9-438d-8823-69e4eafe4349
+
+	measure 'Declined Envelopes' = CALCULATE(COUNTROWS(Envelopes), Envelopes[Status] = "declined")
+		formatString: #,0
+		lineageTag: 9cf966cb-d95a-4c92-8284-f8f6ff42511b
+
 	column AccountId
 		dataType: string
 		lineageTag: 037b81f1-e802-4ef8-9df9-81648f32510d
@@ -78,22 +94,6 @@ table Envelopes
 
 		annotation SummarizationSetBy = Automatic
 
-	measure 'Total Envelopes' = COUNTROWS(Envelopes)
-		formatString: #,0
-		lineageTag: 870409aa-af67-47c5-b415-b0ec73fb32af
-
-	measure 'Completed Envelopes' = CALCULATE(COUNTROWS(Envelopes), Envelopes[Status] = "completed")
-		formatString: #,0
-		lineageTag: 0feae085-acaa-451e-b16b-763063f5860f
-
-	measure 'Voided Envelopes' = CALCULATE(COUNTROWS(Envelopes), Envelopes[Status] = "voided")
-		formatString: #,0
-		lineageTag: 101a8ee1-57d9-438d-8823-69e4eafe4349
-
-	measure 'Declined Envelopes' = CALCULATE(COUNTROWS(Envelopes), Envelopes[Status] = "declined")
-		formatString: #,0
-		lineageTag: 9cf966cb-d95a-4c92-8284-f8f6ff42511b
-
 	partition Envelopes = m
 		mode: import
 		source =
@@ -104,3 +104,4 @@ table Envelopes
 				    Data
 
 	annotation PBI_ResultType = Table
+

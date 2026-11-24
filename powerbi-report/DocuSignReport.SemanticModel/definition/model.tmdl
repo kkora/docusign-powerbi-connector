@@ -10,6 +10,8 @@ annotation PBI_QueryOrder = ["Envelopes","Recipients","Envelope Status","Envelop
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
+annotation PBI_ProTooling = ["DevMode"]
+
 ref table Envelopes
 ref table Recipients
 ref table 'Envelope Status'
@@ -19,10 +21,3 @@ ref table Templates
 ref table 'Envelope Documents'
 ref table Accounts
 
-ref relationship 37170bb1-663e-4cbb-8e02-140a904be879
-ref relationship 77e215a2-d3cd-4a4d-9135-6c5b03105d62
-ref relationship c0204bc6-f06e-4d9a-b55e-a9a38cb0051c
-ref relationship 58d6ea30-c9b0-43f1-b591-2a66ed0fb55b
-ref relationship bdce8ed6-fa1b-42de-a27c-48a4c9a66edb
-ref relationship 6dd2ce8a-5df8-4d75-b2a2-dd546a428789
-ref relationship 5ed81fa4-b2a1-4c76-bc94-c9a76ababef6
