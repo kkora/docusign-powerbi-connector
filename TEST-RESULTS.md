@@ -18,6 +18,37 @@ No test used real DocuSign credentials. OAuth was exercised via PQTest's `OAuthP
 
 This run covers the baseline connector (91 Facts, carried forward unchanged in behavior except the intentionally-extended Recipients schema — see DATA-03) plus the ten new features (F01–F10) added on top of it: Envelope Custom Fields, Historical Date Filtering (`toDate`), Envelope Audit Events, Enhanced Recipients, Multi-Account Selection, Templates, Envelope Documents, API performance/reliability, timezone-aware audit timestamps, and gateway/stable-path compatibility.
 
+## Live verification (2026-11-24)
+
+Unlike everything above, this section used **real DocuSign credentials** — a genuine interactive OAuth login against the live Demo tenant, via:
+
+```sh
+PQTest.exe set-credential -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q DocuSignPowerBI.query.pq --interactive
+```
+
+This took three real attempts to get working, each surfacing a genuine defect that mocked tests couldn't catch (mocks can't validate against DocuSign's actual OAuth server behavior):
+
+1. **`invalid_grant - origin_required_but_not_included`** — DocuSign's token endpoint requires an `Origin` header on the `/oauth/token` request when `redirect_uri` is a browser-loaded `https://` page (which Power BI's OAuth catcher is), regardless of the Integration Key's configured app type. Fixed by adding `Origin: https://oauth.powerbi.com` to `TokenRequest`'s headers.
+2. **`invalid_grant - cors_not_enabled_for_oauth`** — DocuSign's Public Authorization Code Grant additionally requires **"Allow CORS for OAuth calls"** enabled on the Integration Key with the redirect's origin in the allowed list. This setting only exists under **App Type = Single-Page Web Application** — it is hidden under "Native OS Application". (An earlier recommendation in this engagement to use "Native OS Application" was incorrect and has been reversed; see README "DocuSign Admin configuration".)
+3. A `Web.Contents` auto-throw on HTTP 400 was swallowing DocuSign's actual `error`/`error_description` body behind a generic "(400): Bad Request" — fixed by adding `ManualStatusHandling = {400, 401}` to `TokenRequest` and surfacing the real reason in a `DocuSign.OAuth` error.
+
+Once all three were fixed, **`set-credential --interactive` succeeded** (`"Status":"Success"`), and a forced full evaluation of every Navigator table against the live account returned:
+
+| Table | Live row count |
+|---|---|
+| Envelopes | 2 |
+| Recipients | 2 |
+| Envelope Status | 2 |
+| Envelope Custom Fields | 3 |
+| Envelope Audit Events | 17 |
+| Templates | 1 |
+| Envelope Documents | 4 |
+| Accounts | 2 |
+
+This is real evidence that OAuth PKCE, account discovery, envelope pagination, and all five per-envelope endpoints (recipients, custom fields, audit events, documents) and the account-level templates endpoint work end-to-end against DocuSign's actual API — not just against mocks. It does **not** by itself prove Power BI Desktop's own WebView OAuth dialog, the gateway, or scheduled refresh (those remain BLOCKED — see PBI-07 through PBI-10), since this used PQTest's interactive credential flow rather than Desktop itself; however, the credential/token logic exercised is identical in both paths.
+
+A full automated-suite rerun (`run-test` against `test/unit` and `test/integration`) after these three fixes confirmed all 138 mocked Facts still pass unchanged.
+
 ## New feature tests (F01–F10)
 
 | ID | Feature | Result | Evidence |
@@ -100,19 +131,20 @@ It is **not** expressed as a PQUnit `Fact` because once PQTest's harness marks a
 | PBI-02 | `.mez` generated | PASS | `bin\AnyCPU\Debug\DocuSignPowerBI.mez` exists (20,752 bytes at last clean build); confirmed to be a valid ZIP containing `DocuSignPowerBI.pq`, all 8 icon PNGs, and `resources.resx`. |
 | PBI-03 | Connector metadata | PASS | `pqtest info` output shows `DataSourceKind: "DocuSignPowerBI"`, `Publish: {Beta: true, Category: "Online Services", ...}`, `Authentication: OAuth` with `AccessToken`/`RefreshToken`/`Expires` properties, and icons wired via `SourceImage`/`SourceTypeImage`. |
 | PBI-04 | Exactly eight navigator tables | PASS | `01_happy_path.query.pq` — `Table.RowCount(nav) = 8` and names are exactly `Envelopes`, `Recipients`, `Envelope Status`, `Envelope Custom Fields`, `Envelope Audit Events`, `Templates`, `Envelope Documents`, `Accounts` (was 3 tables before this feature set; requirement updated to 8 per the current spec). |
-| PBI-05 | `TestConnection` | PARTIAL | The tuple `TestConnection` returns (`{"DocuSignPowerBI.Contents", "Demo"}`) is exactly the call exercised successfully by every integration test above — so the mechanism is proven. The `pqtest validate` command itself does not support HTTP mocking and requires a live network call with real credentials, which is BLOCKED in this environment (see "Remaining blockers"). |
-| PBI-06 | Stable data source path | PASS | `fromDate`, `toDate`, and `accountId` are all `optional` parameters, so none of them factor into the Data Source Path — confirmed directly in `pqtest run-test`'s `DataSourceAnalysis` output, which shows the identical path `{"environment":"Demo"}` across every integration test despite each using different dates and/or an explicit account. |
-| PBI-07 | Desktop OAuth login | BLOCKED | Requires an interactive browser login against a real DocuSign Demo account; not available in this autonomous/headless environment. |
-| PBI-08 | Desktop data load | BLOCKED | Depends on PBI-07. |
+| PBI-05 | `TestConnection` | PASS | The tuple `TestConnection` returns (`{"DocuSignPowerBI.Contents", "Demo"}`) was exercised for real on 2026-11-24 via `pqtest set-credential --interactive` against a live DocuSign account (`"Status":"Success"`) — see "Live verification" above. The literal `pqtest test-connection` CLI command itself still errors on an unrelated internal JSON-parsing quirk in PQTest's own tuple handling (not in the connector), but the underlying mechanism it would exercise is now proven live. |
+| PBI-06 | Stable data source path | PASS | `fromDate`, `toDate`, and `accountId` are all `optional` parameters, so none of them factor into the Data Source Path — confirmed both in mocked `DataSourceAnalysis` output (identical path across different dates/accounts) and live (`NormalizedPath: {"environment":"Demo"}` on the real stored credential). |
+| PBI-07 | Desktop OAuth login | BLOCKED (mechanism proven via PQTest) | Literal Power BI Desktop UI still not exercised in this environment, but the identical OAuth/PKCE/token-exchange code path was proven live via `pqtest set-credential --interactive`, which drives the same `StartLogin`/`FinishLogin` M functions Desktop calls. |
+| PBI-08 | Desktop data load | BLOCKED (mechanism proven via PQTest) | All 8 tables were forced to evaluate against the live account with real row counts returned (2/2/2/3/17/1/4/2 — see "Live verification"). Desktop's own UI load is still unexercised. |
 | PBI-09 | Gateway connector loading | BLOCKED | Requires a provisioned on-premises data gateway machine. |
 | PBI-10 | Service scheduled refresh | BLOCKED | Requires a Power BI Service tenant, a configured gateway, and a live DocuSign account. |
 
 ## Known limitations
 
 - **Production environment is implemented but untested against a live tenant.** `AuthHost`/`EnvironmentFromPath` support `"Production"` with the same logic as `"Demo"`, and AUTH-06/AUTH-08 reuse the `Production` routing purely as a way to hit a second, distinct mock URL (HTTP mocks only match on method/URL/headers, not body, so two scenarios hitting the same token endpoint can't be told apart otherwise). This is a test-harness device, not a claim that Production OAuth has been exercised against `account.docusign.com`.
-- **`EnvironmentFromPath` is a best-effort, defensive parse.** Power Query does not document an API to deserialize a function-based data source's `dataSourcePath` back into the original parameter record, so `StartLogin`/`FinishLogin`/`Refresh` recover the environment via a substring match on the path's text representation, defaulting to `Demo`. This has been validated for the `Demo` case (every integration test's `DataSourceAnalysis.Path` is `{"environment":"Demo"}`); the `Production` path is logically identical but not live-verified.
+- **`EnvironmentFromPath` is a best-effort, defensive parse.** Power Query does not document an API to deserialize a function-based data source's `dataSourcePath` back into the original parameter record, so `StartLogin`/`FinishLogin`/`Refresh` recover the environment via a substring match on the path's text representation, defaulting to `Demo`. This has now been validated for the `Demo` case against a **live** OAuth login (2026-11-24, not just mocks); the `Production` path is logically identical but still not live-verified.
+- **The token exchange required two DocuSign-specific headers/settings discovered only via live testing** (see "Live verification"): an `Origin` header matching the redirect's origin, and the Integration Key's App Type set to "Single-Page Web Application" with "Allow CORS for OAuth calls" enabled for that origin. This was not — and could not have been — caught by mocked tests, since it depends on DocuSign's real OAuth server validation logic, not on data shape.
 - **429/5xx "recovers after N retries" is not separately tested.** PQTest's HTTP mock server is stateless (the same request always returns the same response), so a mock can't simulate "fails twice, then succeeds." The tests instead prove the bounded-retry-then-fail path (API-08/API-09), which is the harder case: it proves attempts are capped (no infinite loop) and the backoff/Retry-After parsing code runs without throwing.
-- **Templates `Status` column is always `null` against a real tenant.** DocuSign's `GET /templates` response, per the current API reference, does not include a `status` field at all — confirmed via documentation research, not assumed. The column is still exposed (per the required schema) but will not carry data unless DocuSign adds one.
-- **Envelope Audit Events field names are not rigidly fixed by DocuSign.** The `eventFields` array uses generic `{name, value}` pairs whose exact `name` values can vary by event type and API version. `UserName`, `logTime`, and `Action` are confirmed real values (per DocuSign's own developer blog); others (`IP Address`, `EventDescription`, `Result`) are implemented as defensive multi-alias lookups that degrade to `null` rather than erroring, but have **not** been validated against a live tenant's actual audit event payloads. This is the single highest-priority item to verify once live DocuSign access is available.
+- **Templates `Status` column is always `null` against a real tenant.** DocuSign's `GET /templates` response, per the current API reference, does not include a `status` field at all — confirmed via documentation research, not assumed, and consistent with the live Templates row returned in "Live verification" (not independently checked for a non-null Status in that run). The column is still exposed (per the required schema) but will not carry data unless DocuSign adds one.
+- **Envelope Audit Events field names are not rigidly fixed by DocuSign.** The `eventFields` array uses generic `{name, value}` pairs whose exact `name` values can vary by event type and API version. `UserName`, `logTime`, and `Action` are confirmed real values (per DocuSign's own developer blog); others (`IP Address`, `EventDescription`, `Result`) are implemented as defensive multi-alias lookups that degrade to `null` rather than erroring. The live run returned 17 real audit event rows without erroring, confirming the endpoint call and parsing succeed end-to-end; the actual *values* returned for the less-certain aliases were not individually inspected in that run, so field-name correctness for those columns is still not fully confirmed.
 - **F08 performance improvements are structural, not benchmarked.** `Table.Buffer` around the shared `envelopesTable` and the Navigator's inherent column-level laziness are real, verifiable mechanisms (the latter confirmed experimentally via the 401 test's `HttpMock.RequestCount`), but no load test against a large (100+ envelope) account has been run — that requires live API access.
 - **Each new per-envelope table adds its own HTTP call per envelope.** Custom Fields, Audit Events, and Documents each require one additional request per envelope (on top of the existing Recipients call), so an account with many envelopes will make proportionally more API calls when those Navigator tables are actually loaded (they stay unfetched if a report never touches them, per the laziness noted under F08). Respect DocuSign's documented rate limits accordingly.

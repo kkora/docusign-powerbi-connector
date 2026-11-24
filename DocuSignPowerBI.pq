@@ -5,6 +5,12 @@ section DocuSignPowerBI;
 ClientId = "226dd43b-4b8e-488a-9ba8-ac205c100833";
 
 RedirectUri = "https://oauth.powerbi.com/views/oauthredirect.html";
+// Origin of RedirectUri. DocuSign's token endpoint requires an Origin header on
+// the token exchange matching the redirect's origin when redirect_uri is a
+// browser-loaded https:// page (as Power BI's OAuth catcher is) - without it,
+// DocuSign rejects the exchange with invalid_grant/origin_required_but_not_included,
+// regardless of the Integration Key's configured app type (Native vs SPA).
+RedirectOrigin = "https://oauth.powerbi.com";
 Scope = "signature extended";
 
 // Bounded retry tuning for HTTP 429 / 5xx responses.
@@ -141,10 +147,15 @@ TokenRequest = (environment as text, fields as record) as record =>
         response = Web.Contents(DocuSignPowerBI.AuthHost(environment), [
             RelativePath = "oauth/token",
             Content = Text.ToBinary(Uri.BuildQueryString(Record.Combine({fields, [client_id = ClientId]}))),
-            Headers = [#"Content-Type" = "application/x-www-form-urlencoded", Accept = "application/json"]
+            Headers = [#"Content-Type" = "application/x-www-form-urlencoded", Accept = "application/json", Origin = RedirectOrigin],
+            ManualStatusHandling = {400, 401}
         ]),
-        result = DocuSignPowerBI.SafeJsonDocument(response)
-    in result;
+        result = DocuSignPowerBI.SafeJsonDocument(response),
+        checked =
+            if Record.HasFields(result, "error") then
+                error Error.Record("DocuSign.OAuth", "DocuSign token endpoint returned an error: " & Text.From(Record.FieldOrDefault(result, "error", "")) & " - " & Text.From(Record.FieldOrDefault(result, "error_description", "")), result)
+            else result
+    in checked;
 
 // ===== Data Source declaration =====
 
@@ -252,7 +263,13 @@ shared DocuSignPowerBI.ResolveToDate = (toDate as nullable text) as nullable tex
 // ===== HTTP plumbing: null-safe JSON, 401 (engine-refresh), 403, 429/5xx bounded retry =====
 
 shared DocuSignPowerBI.SafeJsonDocument = (response as binary) as any =>
-    try Json.Document(response) otherwise error Error.Record("DocuSign.InvalidResponse", "DocuSign returned a response that could not be parsed as JSON.", null);
+    try Json.Document(response) otherwise
+        let
+            length = Binary.Length(response),
+            previewLength = List.Min({length, 300}),
+            hexPreview = try Binary.ToText(Binary.Range(response, 0, previewLength), BinaryEncoding.Hex) otherwise "<could not hex-encode>",
+            textPreview = try Text.FromBinary(response) otherwise "<not valid text in default encoding>"
+        in error Error.Record("DocuSign.InvalidResponse", "DocuSign returned a response that could not be parsed as JSON. Length=" & Text.From(length) & " HexPreview=" & hexPreview, [Length = length, HexPreview = hexPreview, TextPreview = textPreview]);
 
 shared DocuSignPowerBI.SafeInt = (value as any) as number =>
     if value = null then 0

@@ -2,7 +2,7 @@
 
 Custom Power Query connector for DocuSign eSignature (REST API v2.1), using OAuth 2.0 Authorization Code with PKCE (S256). Exposes exactly eight tables: **Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Accounts**. All read-only — the connector never creates, sends, signs, or modifies anything in DocuSign.
 
-Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 138/138 automated Facts pass against the compiled `.mez`; live Power BI Desktop/gateway/Service steps are documented below but not executed by this repo (they require interactive login and provisioned infrastructure).
+Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 138/138 automated Facts pass against the compiled `.mez`. The OAuth/PKCE/token-exchange path and all 8 tables have also been verified live against a real DocuSign Demo account (see "Live verification" in TEST-RESULTS.md); literal Power BI Desktop UI, gateway, and Service scheduled refresh are documented below but still not executed by this repo (they require provisioned infrastructure beyond interactive login).
 
 ## Connecting
 
@@ -22,6 +22,18 @@ All three optional parameters are excluded from the connector's Data Source Path
 - VS Code with the Power Query SDK extension (`powerquery.vscode-powerquery-sdk`), or just `dotnet` + the SDK's bundled `PQTest.exe`/MSBuild tasks.
 
 The Integration Key (`ClientId`) is already set in `DocuSignPowerBI.pq` — do not replace it.
+
+### DocuSign Admin configuration (required — confirmed by live testing)
+
+On the Integration Key, under **Authentication → User Application**:
+
+- **"Is your application able to securely store a client secret?"** → **No** (this is a public client; PKCE replaces the secret).
+- **"Select App Type"** → **Single-Page Web Application** — *not* "Native OS Application". This matters even though the connector's actual token-exchange HTTP call runs in Power Query's native engine, not browser JavaScript: DocuSign's classification is driven by the redirect mechanism (Power BI's OAuth catcher is a real `https://` page loaded in a browser/WebView), not by which component later makes the token request.
+- **"Authentication Method"** → **Authorization Code Grant with Proof Key for Code Exchange (PKCE)**.
+- Under the **CORS** section (only visible when App Type is Single-Page Web Application): enable **"Allow CORS for OAuth calls"** and add `https://oauth.powerbi.com` as an allowed origin.
+- Under **Redirect URIs**: confirm `https://oauth.powerbi.com/views/oauthredirect.html` is present.
+
+Without the CORS setting enabled, DocuSign's token endpoint rejects the exchange with `invalid_grant / cors_not_enabled_for_oauth`. This was discovered via live testing (see "Live verification" in [TEST-RESULTS.md](TEST-RESULTS.md)) — mocked tests cannot catch it, since it's a property of DocuSign's real OAuth server, not of request/response shapes.
 
 ## Building
 
@@ -52,7 +64,14 @@ PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration\
 ## Power BI Desktop installation
 
 1. Build the `.mez` (above), or use the one already in `bin\AnyCPU\Debug\`.
-2. Copy `DocuSignPowerBI.mez` to `%USERPROFILE%\Documents\Power BI Desktop\Custom Connectors\` (create the folder if it doesn't exist).
+2. Copy `DocuSignPowerBI.mez` to `%USERPROFILE%\Documents\Power BI Desktop\Custom Connectors\` (creates the folder if it doesn't exist):
+
+   ```powershell
+   $dest = "$env:USERPROFILE\Documents\Power BI Desktop\Custom Connectors"
+   New-Item -ItemType Directory -Force -Path $dest | Out-Null
+   Copy-Item "bin\AnyCPU\Debug\DocuSignPowerBI.mez" -Destination $dest -Force
+   ```
+
 3. In Power BI Desktop: **File → Options and settings → Options → Security → Data Extensions** → select **"Allow any extension to load without validation or warning"** (required for an unsigned connector in development).
 4. Restart Power BI Desktop.
 5. **Get Data → More... → Online Services → DocuSign eSignature**, then enter `Demo` (and optionally `fromDate`/`toDate`/`accountId` — see "Connecting" above).
@@ -73,7 +92,7 @@ OAuth connectors on gateways have real constraints (token refresh must succeed u
 
 ## Known limitations
 
-See "Known limitations" in [TEST-RESULTS.md](TEST-RESULTS.md) — in short: the `Production` DocuSign environment is implemented identically to `Demo` but has not been exercised against a live tenant; `EnvironmentFromPath` is a best-effort/defensive parse (Power Query does not document a way to deserialize a function data source's `dataSourcePath`); and 429/5xx retry recovery is proven via the bounded-retry-then-fail path, not a "fails then succeeds" path (not expressible with PQTest's stateless HTTP mock server).
+See "Known limitations" in [TEST-RESULTS.md](TEST-RESULTS.md) — in short: the `Production` DocuSign environment is implemented identically to `Demo` and the `Demo` OAuth path is now live-verified, but `Production` has not been exercised against a live tenant; and 429/5xx retry recovery is proven via the bounded-retry-then-fail path, not a "fails then succeeds" path (not expressible with PQTest's stateless HTTP mock server).
 
 ## Notes
 
