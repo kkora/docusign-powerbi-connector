@@ -191,8 +191,36 @@ DocuSignPowerBI.Icons = [
 // (only required parameters do) - the connection identity stays `{"environment": ...}` regardless
 // of which date range or account a report requests, which is what keeps credentials/gateway config
 // stable across different reports (F05/F10).
+// Ascribed function type: gives the Get Data dialog a dropdown for environment
+// (defaulting to the first listed value, Demo) instead of a free-text box, which
+// is what let "demo"/lowercase typos slip through repeatedly during live testing.
+DocuSignPowerBIType = type function (
+    environment as (type text meta [
+        Documentation.FieldCaption = "Environment",
+        Documentation.FieldDescription = "DocuSign environment to connect to.",
+        Documentation.AllowedValues = {"Demo", "Production"}
+    ]),
+    optional fromDate as (type nullable text meta [
+        Documentation.FieldCaption = "From Date (optional)",
+        Documentation.FieldDescription = "Start date for envelope retrieval, YYYY-MM-DD. Defaults to 30 days ago if left blank."
+    ]),
+    optional toDate as (type nullable text meta [
+        Documentation.FieldCaption = "To Date (optional)",
+        Documentation.FieldDescription = "End date for envelope retrieval, YYYY-MM-DD. Defaults to now if left blank."
+    ]),
+    optional accountId as (type nullable text meta [
+        Documentation.FieldCaption = "Account ID (optional)",
+        Documentation.FieldDescription = "Explicit DocuSign account id, if you have access to more than one (see the Accounts table). Defaults to your default account if left blank."
+    ])
+) as table meta [
+    Documentation.Name = "DocuSign eSignature",
+    Documentation.LongDescription = "Connects to DocuSign eSignature: Envelopes, Recipients, Envelope Status, Envelope Custom Fields, Envelope Audit Events, Templates, Envelope Documents, and Accounts."
+];
+
 [DataSource.Kind = "DocuSignPowerBI", Publish = "DocuSignPowerBI.Publish"]
-shared DocuSignPowerBI.Contents = (environment as text, optional fromDate as nullable text, optional toDate as nullable text, optional accountId as nullable text) as table =>
+shared DocuSignPowerBI.Contents = Value.ReplaceType(DocuSignPowerBIImpl, DocuSignPowerBIType);
+
+DocuSignPowerBIImpl = (environment as text, optional fromDate as nullable text, optional toDate as nullable text, optional accountId as nullable text) as table =>
     let
         _validEnvironment =
             if environment <> "Demo" and environment <> "Production" then
