@@ -1,7 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
   "name": "f2d53980",
-  "position": { "x": 900, "y": 20, "z": 0, "width": 200, "height": 110, "tabOrder": 4 },
+  "position": {
+    "x": 1028,
+    "y": 20,
+    "z": 0,
+    "width": 232,
+    "height": 110,
+    "tabOrder": 4
+  },
   "visual": {
     "visualType": "card",
     "query": {
@@ -11,7 +18,11 @@
             {
               "field": {
                 "Measure": {
-                  "Expression": { "SourceRef": { "Entity": "Accounts" } },
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Accounts"
+                    }
+                  },
                   "Property": "Total Accounts"
                 }
               },

@@ -1,9 +1,32 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/1.2.0/schema.json",
   "layoutOptimization": "None",
-  "themeCollection": {},
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY24SU06",
+      "reportVersionAtImport": "5.55",
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "DocuSignModern",
+      "reportVersionAtImport": "5.55",
+      "type": "RegisteredResources"
+    }
+  },
   "publicCustomVisuals": [],
-  "resourcePackages": [],
+  "resourcePackages": [
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "DocuSignModern",
+          "path": "DocuSignModern.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
   "settings": {
     "useStylableVisualContainerHeader": true
   }

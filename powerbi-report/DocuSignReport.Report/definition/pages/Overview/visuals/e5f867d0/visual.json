@@ -1,7 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
   "name": "e5f867d0",
-  "position": { "x": 620, "y": 150, "z": 0, "width": 640, "height": 300, "tabOrder": 6 },
+  "position": {
+    "x": 620,
+    "y": 150,
+    "z": 0,
+    "width": 640,
+    "height": 550,
+    "tabOrder": 6
+  },
   "visual": {
     "visualType": "tableEx",
     "query": {
@@ -9,27 +16,72 @@
         "Values": {
           "projections": [
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Envelopes" } }, "Property": "EnvelopeId" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Envelopes"
+                    }
+                  },
+                  "Property": "EnvelopeId"
+                }
+              },
               "queryRef": "Envelopes.EnvelopeId",
               "nativeQueryRef": "EnvelopeId"
             },
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Envelopes" } }, "Property": "EmailSubject" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Envelopes"
+                    }
+                  },
+                  "Property": "EmailSubject"
+                }
+              },
               "queryRef": "Envelopes.EmailSubject",
               "nativeQueryRef": "EmailSubject"
             },
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Envelopes" } }, "Property": "Status" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Envelopes"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
               "queryRef": "Envelopes.Status",
               "nativeQueryRef": "Status"
             },
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Envelopes" } }, "Property": "SentDateTime" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Envelopes"
+                    }
+                  },
+                  "Property": "SentDateTime"
+                }
+              },
               "queryRef": "Envelopes.SentDateTime",
               "nativeQueryRef": "SentDateTime"
             },
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Envelopes" } }, "Property": "CompletedDateTime" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Envelopes"
+                    }
+                  },
+                  "Property": "CompletedDateTime"
+                }
+              },
               "queryRef": "Envelopes.CompletedDateTime",
               "nativeQueryRef": "CompletedDateTime"
             }
@@ -37,6 +89,28 @@
         }
       }
     },
-    "objects": {}
+    "objects": {},
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Recent Envelopes'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }

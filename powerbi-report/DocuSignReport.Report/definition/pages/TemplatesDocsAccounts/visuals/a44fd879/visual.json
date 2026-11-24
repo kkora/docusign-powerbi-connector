@@ -1,7 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
   "name": "a44fd879",
-  "position": { "x": 260, "y": 20, "z": 0, "width": 200, "height": 110, "tabOrder": 1 },
+  "position": {
+    "x": 260,
+    "y": 20,
+    "z": 0,
+    "width": 200,
+    "height": 110,
+    "tabOrder": 1
+  },
   "visual": {
     "visualType": "card",
     "query": {
@@ -11,7 +18,11 @@
             {
               "field": {
                 "Measure": {
-                  "Expression": { "SourceRef": { "Entity": "Envelope Documents" } },
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Envelope Documents"
+                    }
+                  },
                   "Property": "Total Documents"
                 }
               },

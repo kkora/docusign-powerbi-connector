@@ -1,7 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.3.0/schema.json",
   "name": "ee57bec2",
-  "position": { "x": 260, "y": 150, "z": 0, "width": 480, "height": 300, "tabOrder": 3 },
+  "position": {
+    "x": 260,
+    "y": 150,
+    "z": 0,
+    "width": 480,
+    "height": 550,
+    "tabOrder": 3
+  },
   "visual": {
     "visualType": "tableEx",
     "query": {
@@ -9,22 +16,58 @@
         "Values": {
           "projections": [
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Templates" } }, "Property": "TemplateName" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Templates"
+                    }
+                  },
+                  "Property": "TemplateName"
+                }
+              },
               "queryRef": "Templates.TemplateName",
               "nativeQueryRef": "TemplateName"
             },
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Templates" } }, "Property": "OwnerName" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Templates"
+                    }
+                  },
+                  "Property": "OwnerName"
+                }
+              },
               "queryRef": "Templates.OwnerName",
               "nativeQueryRef": "OwnerName"
             },
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Templates" } }, "Property": "Shared" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Templates"
+                    }
+                  },
+                  "Property": "Shared"
+                }
+              },
               "queryRef": "Templates.Shared",
               "nativeQueryRef": "Shared"
             },
             {
-              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "Templates" } }, "Property": "CreatedDateTime" } },
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Templates"
+                    }
+                  },
+                  "Property": "CreatedDateTime"
+                }
+              },
               "queryRef": "Templates.CreatedDateTime",
               "nativeQueryRef": "CreatedDateTime"
             }
@@ -32,6 +75,28 @@
         }
       }
     },
-    "objects": {}
+    "objects": {},
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Templates'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }
