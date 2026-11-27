@@ -30,6 +30,18 @@ Notes from this run:
   connector's own Agreements code path has not yet been exercised against the live tenant (that is
   Phase 3 of the plan).
 
+### AgreementsReport `.pbip` / `.pbit` verification (2026-11-27)
+
+The new `powerbi-report/AgreementsReport.pbip` was opened in Power BI Desktop on a real machine:
+the semantic model loaded and refreshed all three Navigator tables live from the Demo (`njeda`)
+account (16 seeded agreements: 4 from the original batch, 12 from batch 2), both report pages
+rendered in the Eda theme, and **File → Export → Power BI template** produced
+`powerbi-report/Templates/AgreementsReport.pbit`, which passed `package-distribution.ps1`'s
+staleness and `DataModelSchema` checks and now ships in `dist\` alongside `DocuSignReport.pbit`.
+This exercises the connector's live Navigator path end-to-end through Desktop's own OAuth and
+refresh (closing the "not yet exercised against the live tenant" caveat above). Desktop accepted
+the hand-authored PBIR/TMDL without rewriting any source file on open.
+
 Everything below this line is the prior v1.2.0 report, unchanged.
 
 ---

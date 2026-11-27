@@ -96,7 +96,7 @@ A second, independent `.pbip` (`AgreementsReport.pbip` → `AgreementsReport.Rep
 
 ### Verification status
 
-**Authored 2026-11-27, not yet opened in Power BI Desktop.** All 24 JSON files parse, every visual field reference was machine-checked against the TMDL model (99 fields), and the three PBIR pitfalls documented above (version `2.0.0`, `themeCollection`, TMDL tab indentation) were applied from the start. Desktop open + live refresh is the remaining verification step.
+**Verified working in Power BI Desktop on 2026-11-27**: the `.pbip` opened, the model refreshed live Navigator data from the Demo (`njeda`) account — the seeded agreement set (4 original + 12 batch-2 uploads) rendered across both pages — and **File → Export → Power BI template** produced `Templates\AgreementsReport.pbit`, which passed `package-distribution.ps1`'s checks and ships in `dist\`. Notably, Desktop accepted the hand-authored PBIR/TMDL **without rewriting a single source file** on open (unlike the first report, which needed three fixes): all 24 JSON files had been parse-checked, every visual field reference machine-verified against the TMDL model (99 fields), and the three PBIR pitfalls documented above (version `2.0.0`, `themeCollection`, TMDL tab indentation) applied from the start. One post-open fix: the `*YearNumber` columns needed `formatString: 0` to stop year axes rendering as `2,025`.
 
 ### Semantic model
 
