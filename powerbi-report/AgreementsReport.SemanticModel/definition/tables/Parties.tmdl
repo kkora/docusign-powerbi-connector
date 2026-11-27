@@ -5,6 +5,13 @@ table Parties
 		formatString: #,0
 		lineageTag: fbd21d02-b209-4f0b-8cac-3f5f71069996
 
+	/// Counts agreements per party from the many side of the relationship. The Agreements
+	/// count measure cannot be sliced by PartyName (single-direction filter flows
+	/// Agreements -> Parties only), which rendered every party as the grand total.
+	measure 'Party Agreements' = COALESCE(DISTINCTCOUNT(Parties[AgreementId]), 0)
+		formatString: #,0
+		lineageTag: 5c21e4d8-7f3a-4b96-a1d0-82e6c94f0b17
+
 	column AccountId
 		dataType: string
 		lineageTag: 3b1a71eb-731d-4a2f-96b7-7ec5f067ee2c
@@ -47,3 +54,4 @@ table Parties
 				    Data
 
 	annotation PBI_ResultType = Table
+

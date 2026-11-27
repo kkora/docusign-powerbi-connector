@@ -55,3 +55,4 @@ table CustomField
 				    Data
 
 	annotation PBI_ResultType = Table
+

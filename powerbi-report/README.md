@@ -116,9 +116,17 @@ Measures (ported from the official template, all `COALESCE`-wrapped; `Fiscal_*`,
 
 ### Report pages (Eda theme, same as DocuSignReport)
 
+Rendered in Power BI Desktop (2026-11-27, live Demo-account data, 16 agreements):
+
+| Page | Screenshot |
+|---|---|
+| Agreements Overview | [screenshots/agreements-overview.png](screenshots/agreements-overview.png) |
+| Renewals & Deadlines | [screenshots/agreements-renewals.png](screenshots/agreements-renewals.png) |
+| Custom Fields | [screenshots/agreements-custom-fields.png](screenshots/agreements-custom-fields.png) |
+
 | Page | Visuals |
 |---|---|
-| Agreements Overview | 5 KPI cards (total / active / expiring 90d / renewal due 90d / total value), status-breakdown donut, Agreements by Type, Agreements by Party (via the Parties relationship), agreement detail table |
+| Agreements Overview | 5 KPI cards (total / active / expiring 90d / renewal due 90d / total value), status-breakdown donut, Agreements by Type, Agreements by Party (uses the Parties-side `Party Agreements` measure — the single-direction relationship means an Agreements-side count cannot be sliced by PartyName), agreement detail table |
 | Renewals & Deadlines | RenewalType slicer, 4 cards (renewing soon / expiring non-renewing / pending renewal / expired), Expirations by Year, Agreements by Governing Law, renewal-pipeline table (notice dates, termination deadlines) |
 | Custom Fields | FieldName slicer, Custom Field Entries card, custom-field values table (agreement title / field / value via the CustomField relationship) |
 

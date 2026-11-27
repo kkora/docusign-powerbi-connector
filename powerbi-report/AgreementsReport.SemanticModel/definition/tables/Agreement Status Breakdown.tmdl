@@ -18,3 +18,4 @@ table 'Agreement Status Breakdown'
 				    Source
 
 	annotation PBI_ResultType = Table
+

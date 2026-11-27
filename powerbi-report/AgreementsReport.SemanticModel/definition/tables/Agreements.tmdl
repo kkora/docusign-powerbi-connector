@@ -581,109 +581,127 @@ table Agreements
 		annotation SummarizationSetBy = Automatic
 
 	column IsActive
-		dataType: int64
+		dataType: double
 		lineageTag: 437333df-e89f-48c6-883b-8702bc20b008
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsActive
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsActiveIn30days
-		dataType: int64
+		dataType: double
 		lineageTag: 51a4db45-5008-4933-9b7e-37ac5ee1bf5d
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsActiveIn30days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsExpiringIn30days
-		dataType: int64
+		dataType: double
 		lineageTag: 418fdd74-a060-4292-8115-5a4f8de6e295
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsExpiringIn30days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsRenewingIn30days
-		dataType: int64
+		dataType: double
 		lineageTag: e5cb51cf-26ff-4c6e-89d5-12bc15cfb8aa
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsRenewingIn30days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsTakingEffectIn30days
-		dataType: int64
+		dataType: double
 		lineageTag: aed09d72-db84-4fbc-b51f-405a3977f89e
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsTakingEffectIn30days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsActiveIn90days
-		dataType: int64
+		dataType: double
 		lineageTag: 7a1220f6-0e72-4b12-928a-36707f1c1141
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsActiveIn90days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsExpiringIn90days
-		dataType: int64
+		dataType: double
 		lineageTag: 6657b724-e5a4-42a4-85f2-566c0356b8aa
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsExpiringIn90days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsRenewingIn90days
-		dataType: int64
+		dataType: double
 		lineageTag: 716f726f-b68f-469a-bf89-a30190050584
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsRenewingIn90days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column IsTakingEffectIn90days
-		dataType: int64
+		dataType: double
 		lineageTag: eaf52aa6-a263-4c0a-84b8-e1c46661254d
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: IsTakingEffectIn90days
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
 	column EffectiveYearNumber
-		dataType: int64
+		dataType: double
 		formatString: 0
 		lineageTag: 09d6d21e-92f6-475c-b565-cf34c2868943
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: EffectiveYearNumber
 
 		annotation SummarizationSetBy = Automatic
 
 	column ExpirationYearNumber
-		dataType: int64
+		dataType: double
 		formatString: 0
 		lineageTag: 2a9f2580-dc2c-456e-af73-096f68e5c0ac
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: ExpirationYearNumber
 
 		annotation SummarizationSetBy = Automatic
 
 	column ExecutionYearNumber
-		dataType: int64
+		dataType: double
 		formatString: 0
 		lineageTag: be753937-486d-41a1-a068-6a05adea8da0
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: ExecutionYearNumber
 
 		annotation SummarizationSetBy = Automatic
 
 	column RenewalNoticeYearNumber
-		dataType: int64
+		dataType: double
 		formatString: 0
 		lineageTag: 70564823-88c0-4920-b45f-3e7ef10890a6
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: RenewalNoticeYearNumber
 
 		annotation SummarizationSetBy = Automatic
@@ -714,3 +732,4 @@ table Agreements
 				    Data
 
 	annotation PBI_ResultType = Table
+

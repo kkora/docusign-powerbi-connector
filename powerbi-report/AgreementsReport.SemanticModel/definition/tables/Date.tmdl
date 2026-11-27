@@ -10,6 +10,8 @@ table Date
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation UnderlyingDateTimeDataType = Date
+
 	column Year
 		dataType: int64
 		formatString: 0
@@ -22,9 +24,9 @@ table Date
 	column 'Month Name'
 		dataType: string
 		lineageTag: 631aeebc-123b-4bf3-ac2d-6715f05deaf1
-		sortByColumn: 'Month Number'
 		summarizeBy: none
 		sourceColumn: Month Name
+		sortByColumn: 'Month Number'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -40,9 +42,9 @@ table Date
 	column Month
 		dataType: string
 		lineageTag: fa605cf5-5fd7-49ed-9c23-81b25c934f4e
-		sortByColumn: 'Month Sort'
 		summarizeBy: none
 		sourceColumn: Month
+		sortByColumn: 'Month Sort'
 
 		annotation SummarizationSetBy = Automatic
 
@@ -73,3 +75,4 @@ table Date
 				    WithMonthSort
 
 	annotation PBI_ResultType = Table
+

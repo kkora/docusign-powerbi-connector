@@ -7,3 +7,4 @@ expression AccountId = null meta [IsParameterQuery=true, Type="Any", IsParameter
 	lineageTag: d985ae99-451c-41e7-8336-7affca67fec7
 
 	annotation PBI_ResultType = Null
+

@@ -39,14 +39,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Agreements"
+                      "Entity": "Parties"
                     }
                   },
-                  "Property": "Agreements"
+                  "Property": "Party Agreements"
                 }
               },
-              "queryRef": "Agreements.Agreements",
-              "nativeQueryRef": "Agreements"
+              "queryRef": "Parties.Party Agreements",
+              "nativeQueryRef": "Party Agreements"
             }
           ]
         }
