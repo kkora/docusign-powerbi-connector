@@ -119,3 +119,42 @@ Omit `-SkipCompleted` if the completed envelope was never signed.
 
 - The script is **not idempotent**: each run creates a new template and three new envelopes. That's harmless in a Demo account, but repeated runs will accumulate duplicates named "PBI Test Template".
 - The access token is held only in the PowerShell session's memory and is not written to disk.
+
+## seed-navigator-contracts.ps1
+
+Generates contract `.docx` files with rich, deliberately varied extractable terms, for **manual upload** into DocuSign Navigator's Upload Center — seeding the `Agreements` / `Parties` / `CustomField` tables added to the connector in v1.3.0 and the planned `AgreementsReport.pbip` (see [AGREEMENTS-REPORT-PLAN.md](../AGREEMENTS-REPORT-PLAN.md)).
+
+Unlike `seed-docusign-data.ps1`, this script makes **no API calls and needs no login**: Navigator's public API is read-only (`adm_store_unified_repo_read`), so there is no programmatic upload path. The script only writes files locally; getting them into Navigator is a drag-and-drop step you do once in the browser.
+
+### How it works
+
+Each document is a minimal OpenXML `.docx` (three zip entries: `[Content_Types].xml`, `_rels/.rels`, `word/document.xml`) built directly from PowerShell — no Word installation required. The contract text is written so Navigator's AI extraction finds real values for the provisions the report uses: effective/expiration/execution dates, term length, renewal type and notice period, payment terms, late-payment fees, contract values with currency, liability caps, assignment, confidentiality duration, NDA type, governing law, and named parties.
+
+Two batches are produced:
+
+| Folder | Contents | Status |
+| --- | --- | --- |
+| `Downloads\navigator-seed\` | Original 3 contracts (mutual NDA, auto-renew MSA, option-to-renew office lease) | Uploaded to the `njeda` Demo account on 2026-11-26; extraction verified via the live Navigator API |
+| `Downloads\navigator-seed\batch2\` | 12 further contracts | Generated for upload |
+
+Batch 2 is shaped so every report visual has data: expired agreements (Pinelands supply, Meridian consulting), expiring within 30 days (BrightPath SOW, Newark lease — the latter with an already-lapsed renewal-notice deadline), expiring within 90 days (CloudLedger SaaS), taking effect soon (Shoreline marketing), auto-renew with 30/45/60/90-day notice periods and even 6-month terms (CloudLedger, Shoreline, MapWorks, Liberty HVAC, Capital Temp), renew-option vs fixed-term contrasts, a unilateral NDA alongside the mutual ones, values from $36k to $420k, Net 10–60 payment terms, and NJ/NY/PA/DE governing law across 10 distinct counterparties.
+
+### Usage
+
+```powershell
+.\seed-navigator-contracts.ps1
+```
+
+No parameters. Output folders are created as needed; existing files are overwritten (regeneration is idempotent).
+
+### The manual upload step
+
+1. Sign in to the **Demo** account at `https://apps-d.docusign.com` with the **njeda** account (the only one with Navigator provisioned — the other account 403s with `EnableNavigatorAPIDataOut`).
+2. Open **Agreements**, click the **+ upload** button, and select the files from `Downloads\navigator-seed\batch2\`.
+3. Wait a few minutes for AI extraction (`review_status` stays `PENDING` — that's fine, the API still serves the extracted provisions).
+
+### Notes
+
+- **Date anchors**: the "expiring soon" / "taking effect soon" contracts assume a late-November-2026 clock (expirations mid-Dec 2026 – Jan 2027). If you reseed much later, shift the dates in the specs or the time-window visuals will show stale buckets.
+- Navigator deduplicates by document hash, so re-uploading an unchanged file does not create a duplicate agreement; editing any text produces a new document hash and therefore a new agreement.
+- Extraction quality was verified live on the original batch: Navigator typed the documents `Nda`/`Msa`/`Lease` with 11–19 provisions and both parties each (raw captures in `test/mocks/navigator-*.json`).
