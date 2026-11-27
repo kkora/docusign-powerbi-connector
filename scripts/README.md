@@ -1,5 +1,44 @@
 # Scripts
 
+## package-distribution.ps1
+
+Builds and packages everything an end user needs to run the report, into `dist\`:
+`DocuSignPowerBI.mez` (the connector), `DocuSignReport.pbit` (the parameterized report
+template), and a generated `INSTALL.md` with end-user setup steps.
+
+### What it does
+
+1. **Build** — compiles the connector via `dotnet msbuild DocuSignPowerBI.proj -t:BuildMez`.
+2. **Deploy** — copies the fresh `.mez` into this machine's `Documents\Power BI Desktop\Custom Connectors` folder (skip with `-SkipDeploy`). Restart Power BI Desktop afterwards to load it.
+3. **Verify template** — checks that `powerbi-report\Templates\DocuSignReport.pbit` exists, warns if it's older than any report/model source file, and inspects the zip's `DataModelSchema` to confirm it contains the parameterized `DocuSignPowerBI.Contents(Environment, AccountId)` call and the `Environment`/`AccountId` parameters — catching a stale export before it ships.
+4. **Package** — assembles `dist\` with the `.mez`, `.pbit`, and `INSTALL.md`.
+
+### The one manual step
+
+Power BI Desktop is the only tool that can export a `.pbit` (there is no CLI for it).
+After any report or model change:
+
+1. Open `powerbi-report\DocuSignReport.pbip` in Power BI Desktop.
+2. **File → Export → Power BI template**.
+3. Save as `powerbi-report\Templates\DocuSignReport.pbit`.
+4. Re-run this script.
+
+The template stores no data and no credentials — on open it prompts for `Environment`
+and `AccountId`, then runs OAuth sign-in.
+
+### Usage and parameters
+
+```powershell
+.\package-distribution.ps1              # build + deploy + verify + package
+.\package-distribution.ps1 -SkipDeploy  # build + verify + package only
+```
+
+| Parameter | Required | Default | Description |
+| --- | --- | --- | --- |
+| `PbitPath` | No | `powerbi-report\Templates\DocuSignReport.pbit` | Location of the Desktop-exported template. |
+| `SkipDeploy` | No | off | Don't copy the `.mez` to the local Custom Connectors folder. |
+| `DistDir` | No | `dist` | Output folder for the distribution package. |
+
 ## seed-docusign-data.ps1
 
 Seeds a DocuSign **Demo** account with one reusable template and three test envelopes — one **completed**, one **pending**, one **voided** — so the DocuSignPowerBI connector has varied data to display in Power BI.
@@ -35,7 +74,7 @@ When the signing page opens for envelope #1, click through and sign it, then ret
 ### Parameters
 
 | Parameter | Required | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `SignerEmail` | Yes | — | Email used as the recipient on all three envelopes. |
 | `SignerName` | Yes | — | Display name shown on the signed document. |
 | `ClientId` | No | `226dd43b-...-100833` | The connector's public Integration Key. |
@@ -47,7 +86,7 @@ When the signing page opens for envelope #1, click through and sign it, then ret
 ### What you end up with
 
 | Item | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | PBI Test Template | — | Reusable template with one signer role (`signer1`). |
 | PBI Test Envelope - Completed | `completed` | Signed by you via embedded signing. |
 | PBI Test Envelope - Pending | `sent` | Arrives in your inbox; leave it unsigned. |
