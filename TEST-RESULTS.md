@@ -1,5 +1,39 @@
 # Test Results
 
+## v1.3.0 — Navigator Agreements tables (run date 2026-11-27)
+
+Connector v1.3.0 adds three DocuSign **Navigator** (agreement repository) tables — `Agreements`, `Parties`, `CustomField` — fed by `GET https://api-d.docusign.com/v1/accounts/{id}/agreements` with `_links.next`/ctoken pagination, plus the `adm_store_unified_repo_read` scope. Full suites re-run against the rebuilt `.mez` (same toolchain as the v1.2.0 report below):
+
+| Suite | Facts run | Passed | Failed |
+| --- | --- | --- | --- |
+| `test/unit/*.query.pq` (now incl. `05_agreements_transforms`, 34 new Facts) | 124 | 124 | 0 |
+| `test/integration/*.query.pq` (now incl. `09_agreements_endpoints`, 12 new Facts) | 60 | 60 | 0 |
+| **Total** | **184** | **184** | **0** |
+
+Notes from this run:
+
+- `01_happy_path` PBI-04 Facts updated from "exactly eight tables" to "exactly eleven tables".
+- Date-window flag columns (`IsExpiringIn90days` etc.) are asserted only in the unit suite, where
+  `BuildAgreementsTable`'s `asOfDate` parameter pins the clock; the integration suite asserts
+  pass-through mapping, pagination stitching, and clock-independent derivations only.
+- The Navigator mocks (recorded from the live Demo responses of 2026-11-26, see
+  AGREEMENTS-REPORT-PLAN.md §5) exposed a PQTest `--httpMock` matching subtlety: a mock entry
+  matches when its URL's query parameters are a **subset** of the request's, and the first match
+  wins. The page-1 entry (`?limit=100`) therefore shadowed the page-2 entry
+  (`?limit=100&ctoken=page2`), returning page 1 — whose `next` link points at page 2 — for every
+  page-2 request: an infinite pagination loop presenting as a silent test hang with a hot
+  `Microsoft.Mashup.Container` process. Fix: the more-specific ctoken entry is ordered **before**
+  the plain entry in `test/mocks/docusign-mocks.txt`. Keep that ordering when adding paginated mocks.
+- Navigator API live verification (OAuth with the new scope, list/detail endpoints, real extracted
+  provisions/parties from seeded contracts) was performed on 2026-11-26 outside PQTest — results
+  and raw captures in AGREEMENTS-REPORT-PLAN.md §5 and `test/mocks/navigator-*.json`. The
+  connector's own Agreements code path has not yet been exercised against the live tenant (that is
+  Phase 3 of the plan).
+
+Everything below this line is the prior v1.2.0 report, unchanged.
+
+---
+
 Run date: 2026-11-21. Toolchain: Power Query SDK `Microsoft.PowerQuery.SdkTools 2.160.2` (`PQTest.exe`), built via `dotnet msbuild DocuSignPowerBI.proj /t:BuildMez` (MSBuild 18.9.15). Artifact under test: `bin\AnyCPU\Debug\DocuSignPowerBI.mez` (clean rebuild, see PBI-02).
 
 All tests below were **actually executed** against the compiled `.mez` — no result is asserted without a corresponding `pqtest run-test` invocation. Commands to reproduce are in [README.md](README.md#running-the-automated-tests).

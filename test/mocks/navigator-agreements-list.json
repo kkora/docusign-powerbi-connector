@@ -1,0 +1,249 @@
+﻿{
+    "response_metadata":  {
+                              "page_limit":  20,
+                              "request_id":  "0HNQAG15TFV6V:0000023E",
+                              "response_timestamp":  "2026-11-27T03:49:22.5813049Z",
+                              "response_duration_ms":  564
+                          },
+    "_links":  {
+                   "first":  {
+                                 "href":  "/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreements?limit=20"
+                             },
+                   "self":  {
+                                "href":  "/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreements?limit=20"
+                            }
+               },
+    "data":  [
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T03:46:59.574023+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T03:47:17.021069+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/4c64f72e-934f-421c-b448-183731a1bbb7"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "34c8b9ed-e58b-40cf-8cc0-bc4445e3aeac",
+                     "title":  "Mutual Non-Disclosure Agreement",
+                     "file_name":  "Mutual NDA - NJEDA and Garden State Analytics.docx",
+                     "document_id":  "4c64f72e-934f-421c-b448-183731a1bbb7",
+                     "type":  "Nda",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "9bf9d7f0-6e53-4610-94f6-4c4b50600419",
+                                         "name_in_agreement":  "Garden State Analytics LLC"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-01-15T00:00:00",
+                                        "expiration_date":  "2028-01-14T00:00:00",
+                                        "execution_date":  "2026-01-10T00:00:00",
+                                        "term_length":  "P2Y",
+                                        "confidentiality_obligation_period":  "P5Y",
+                                        "governing_law":  "Laws of the State of New Jersey",
+                                        "jurisdiction":  "Mercer County, New Jersey",
+                                        "nda_type":  "MUTUAL",
+                                        "renewal_type":  "FIXED_TERM",
+                                        "renewal_notice_date":  "2028-01-14T00:00:00",
+                                        "termination_period_for_convenience":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "4c64f72e-934f-421c-b448-183731a1bbb7",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "CFjitwRZeF3qOUGzDMBbC"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T03:46:59.573335+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T03:48:15.493053+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/8944c4cf-81eb-42c3-b883-cd1575ff3067"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "bb855ef5-77cc-46d4-a559-1f67fcd4153e",
+                     "title":  "Master Services Agreement",
+                     "file_name":  "Master Services Agreement - NJEDA and BrightPath Consulting.docx",
+                     "document_id":  "8944c4cf-81eb-42c3-b883-cd1575ff3067",
+                     "type":  "Msa",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "0f26eb0b-f480-4e29-a4db-3bc0daefacec",
+                                         "name_in_agreement":  "BrightPath Consulting Inc."
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-03-01T00:00:00",
+                                        "expiration_date":  "2027-02-28T00:00:00",
+                                        "execution_date":  "2026-02-20T00:00:00",
+                                        "term_length":  "P1Y",
+                                        "assignment_type":  "NO_OR_CONSENT_REQUIRED",
+                                        "assignment_change_of_control":  "YES_WITH_CONDITIONS",
+                                        "assignment_termination_rights":  "YES",
+                                        "governing_law":  "New Jersey",
+                                        "payment_terms_due_date":  "THIRTY_DAYS",
+                                        "can_charge_late_payment_fees":  true,
+                                        "late_payment_fee_percent":  1.5,
+                                        "liability_cap_duration":  "P12M",
+                                        "price_cap_percent_increase":  5,
+                                        "renewal_type":  "AUTO_RENEW",
+                                        "renewal_notice_period":  "P60D",
+                                        "renewal_notice_date":  "2026-12-30T00:00:00",
+                                        "auto_renewal_term_length":  "P1Y",
+                                        "termination_period_for_cause":  "P15D",
+                                        "termination_period_for_convenience":  "P45D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "8944c4cf-81eb-42c3-b883-cd1575ff3067",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "CFjitwRZeF3qOUGzDMBbC"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T03:46:59.566757+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T03:47:55.185049+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/4a46b9fb-547e-4bca-9571-725533fa05f0"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "25a2857f-f6ad-4821-acd6-fa28d6019c44",
+                     "title":  "Commercial Office Lease Agreement",
+                     "file_name":  "Office Lease Agreement - Trenton Commerce Center.docx",
+                     "document_id":  "4a46b9fb-547e-4bca-9571-725533fa05f0",
+                     "type":  "Lease",
+                     "category":  "Miscellaneous",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "06f0a8d1-b371-4bc7-9af0-d43756540f04",
+                                         "name_in_agreement":  "Trenton Commerce Center Partners LP"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2024-03-01T00:00:00",
+                                        "expiration_date":  "2027-02-28T00:00:00",
+                                        "execution_date":  "2024-02-15T00:00:00",
+                                        "term_length":  "P3Y",
+                                        "governing_law":  "New Jersey",
+                                        "jurisdiction":  "Mercer County, New Jersey",
+                                        "annual_agreement_value":  45000,
+                                        "annual_agreement_value_currency_code":  "USD",
+                                        "total_agreement_value":  45000,
+                                        "total_agreement_value_currency_code":  "USD",
+                                        "payment_terms_due_date":  "OTHER",
+                                        "can_charge_late_payment_fees":  true,
+                                        "late_payment_fee_percent":  5,
+                                        "renewal_type":  "RENEW_OPTION",
+                                        "renewal_notice_period":  "P90D",
+                                        "renewal_notice_date":  "2026-11-30T00:00:00",
+                                        "auto_renewal_term_length":  "P2Y",
+                                        "termination_period_for_cause":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "4a46b9fb-547e-4bca-9571-725533fa05f0",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "CFjitwRZeF3qOUGzDMBbC"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T03:28:16.096489+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T03:28:25.113995+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/27e14130-0913-4c3a-a3c6-9168d482e7fb"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "fb2a7aed-11c0-4ef7-a4d2-68315286278f",
+                     "title":  "BANK ACCOUNT VERIFICATION FORM",
+                     "file_name":  "BANK ACCOUNT VERIFICATION FORM.docx",
+                     "document_id":  "27e14130-0913-4c3a-a3c6-9168d482e7fb",
+                     "type":  "Other",
+                     "category":  "Miscellaneous",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "provisions":  {
+
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "de"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "27e14130-0913-4c3a-a3c6-9168d482e7fb",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+
+                                           ]
+                 }
+             ]
+}

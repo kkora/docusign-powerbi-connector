@@ -362,3 +362,142 @@ Content-Type: application/json
     { "envelopeId": "env-acct2-1", "emailSubject": "Account 2 envelope", "status": "sent", "sentDateTime": "2024-10-01T08:00:00.0000000Z" }
   ]
 }
+
+------------------------------------------------------------------
+
+GET https://api-d.docusign.com/v1/accounts/ACCT-1/agreements?limit=100&ctoken=page2 HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "response_metadata": { "page_limit": 100 },
+  "_links": {
+    "self": { "href": "/accounts/ACCT-1/agreements?limit=100&ctoken=page2" }
+  },
+  "data": [
+    {
+      "id": "ag-lease-3",
+      "title": "Commercial Office Lease Agreement",
+      "file_name": "Office Lease - Trenton Commerce Center.docx",
+      "document_id": "doc-lease-3",
+      "type": "Lease",
+      "category": "RealEstate",
+      "status": "COMPLETE",
+      "review_status": "PENDING",
+      "metadata": { "created_at": "2026-11-27T03:47:10.000000+00:00", "modified_at": "2026-11-27T03:48:20.000000+00:00" },
+      "parties": [
+        { "id": "party-lease-a", "name_in_agreement": "Trenton Commerce Center Partners LP" }
+      ],
+      "provisions": {
+        "effective_date": "2024-03-01T00:00:00",
+        "expiration_date": "2027-02-28T00:00:00",
+        "execution_date": "2024-02-15T00:00:00",
+        "term_length": "P3Y",
+        "governing_law": "New Jersey",
+        "jurisdiction": "Mercer County, New Jersey",
+        "annual_agreement_value": 45000,
+        "annual_agreement_value_currency_code": "USD",
+        "total_agreement_value": 45000,
+        "total_agreement_value_currency_code": "USD",
+        "payment_terms_due_date": "OTHER",
+        "can_charge_late_payment_fees": true,
+        "late_payment_fee_percent": 5,
+        "renewal_type": "RENEW_OPTION",
+        "renewal_notice_period": "P90D",
+        "renewal_notice_date": "2026-11-30T00:00:00",
+        "auto_renewal_term_length": "P2Y",
+        "termination_period_for_cause": "P30D",
+        "termination_period_for_convenience": "P60D"
+      },
+      "custom_provisions": {},
+      "languages": ["en"],
+      "source_name": "UploadCenter",
+      "source_id": "doc-lease-3",
+      "source_account_id": "ACCT-1",
+      "agreement_set_ids": []
+    }
+  ]
+}
+
+
+------------------------------------------------------------------
+
+GET https://api-d.docusign.com/v1/accounts/ACCT-1/agreements?limit=100 HTTP/1.1
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "response_metadata": { "page_limit": 100 },
+  "_links": {
+    "self": { "href": "/accounts/ACCT-1/agreements?limit=100" },
+    "next": { "href": "/accounts/ACCT-1/agreements?limit=100&ctoken=page2" }
+  },
+  "data": [
+    {
+      "id": "ag-msa-1",
+      "title": "Master Services Agreement",
+      "file_name": "MSA - Example Vendor.docx",
+      "document_id": "doc-msa-1",
+      "type": "Msa",
+      "category": "BusinessServices",
+      "status": "COMPLETE",
+      "review_status": "PENDING",
+      "metadata": { "created_at": "2026-11-27T03:46:59.573335+00:00", "modified_at": "2026-11-27T03:48:15.493053+00:00" },
+      "parties": [
+        { "id": "party-msa-a", "name_in_agreement": "New Jersey Economic Development Authority" },
+        { "id": "party-msa-b", "name_in_agreement": "BrightPath Consulting Inc." }
+      ],
+      "provisions": {
+        "effective_date": "2026-03-01T00:00:00",
+        "expiration_date": "2027-02-28T00:00:00",
+        "execution_date": "2026-02-20T00:00:00",
+        "term_length": "P1Y",
+        "assignment_type": "NO_OR_CONSENT_REQUIRED",
+        "assignment_change_of_control": "YES_WITH_CONDITIONS",
+        "assignment_termination_rights": "YES",
+        "governing_law": "New Jersey",
+        "payment_terms_due_date": "THIRTY_DAYS",
+        "can_charge_late_payment_fees": true,
+        "late_payment_fee_percent": 1.5,
+        "liability_cap_duration": "P12M",
+        "price_cap_percent_increase": 5,
+        "renewal_type": "AUTO_RENEW",
+        "renewal_notice_period": "P60D",
+        "renewal_notice_date": "2026-12-30T00:00:00",
+        "auto_renewal_term_length": "P1Y",
+        "termination_period_for_cause": "P15D",
+        "termination_period_for_convenience": "P45D",
+        "total_agreement_value": 240000,
+        "total_agreement_value_currency_code": "USD",
+        "annual_agreement_value": 240000,
+        "annual_agreement_value_currency_code": "USD"
+      },
+      "custom_provisions": { "department": "Legal", "lease_deposit": 17500 },
+      "languages": ["en"],
+      "source_name": "UploadCenter",
+      "source_id": "doc-msa-1",
+      "source_account_id": "ACCT-1",
+      "agreement_set_ids": []
+    },
+    {
+      "id": "ag-form-2",
+      "title": "Bank Account Verification Form",
+      "file_name": "BANK ACCOUNT VERIFICATION FORM.docx",
+      "document_id": "doc-form-2",
+      "type": "Other",
+      "category": "Miscellaneous",
+      "status": "COMPLETE",
+      "review_status": "PENDING",
+      "metadata": { "created_at": "2026-11-27T03:28:16.096489+00:00", "modified_at": "2026-11-27T03:28:25.113995+00:00" },
+      "provisions": {},
+      "custom_provisions": {},
+      "languages": ["de"],
+      "source_name": "UploadCenter",
+      "source_id": "doc-form-2",
+      "source_account_id": "ACCT-1",
+      "agreement_set_ids": []
+    }
+  ]
+}

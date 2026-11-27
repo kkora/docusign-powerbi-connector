@@ -1,8 +1,10 @@
 # DocuSign Power BI Connector
 
-Custom Power Query connector for DocuSign eSignature (REST API v2.1), using OAuth 2.0 Authorization Code with PKCE (S256). Exposes exactly eight tables: **Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Accounts**. All read-only — the connector never creates, sends, signs, or modifies anything in DocuSign.
+Custom Power Query connector for DocuSign, using OAuth 2.0 Authorization Code with PKCE (S256). Exposes exactly eleven tables — eight from the eSignature REST API v2.1 (**Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Accounts**) plus three from the DocuSign Navigator agreement-repository API (**Agreements**, **Parties**, **CustomField** — see [AGREEMENTS-REPORT-PLAN.md](AGREEMENTS-REPORT-PLAN.md)). All read-only — the connector never creates, sends, signs, or modifies anything in DocuSign.
 
-Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 138/138 automated Facts pass against the compiled `.mez`. The OAuth/PKCE/token-exchange path and all 8 tables have also been verified live against a real DocuSign Demo account (see "Live verification" in TEST-RESULTS.md); literal Power BI Desktop UI, gateway, and Service scheduled refresh are documented below but still not executed by this repo (they require provisioned infrastructure beyond interactive login).
+Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 184/184 automated Facts pass against the compiled `.mez`. The OAuth/PKCE/token-exchange path and all 8 eSignature tables have also been verified live against a real DocuSign Demo account (see "Live verification" in TEST-RESULTS.md), and the Navigator API itself was live-verified on 2026-11-26 (see AGREEMENTS-REPORT-PLAN.md §5); literal Power BI Desktop UI, gateway, and Service scheduled refresh are documented below but still not executed by this repo (they require provisioned infrastructure beyond interactive login).
+
+The Navigator tables require the account to have DocuSign Navigator provisioned (403 `EnableNavigatorAPIDataOut` otherwise) and the OAuth scope `adm_store_unified_repo_read` (requested automatically since v1.3.0 — a credential saved by an older version must be cleared and re-entered once to pick it up). Accounts without Navigator can still load all eight eSignature tables; the agreement tables are only fetched if actually selected.
 
 ## Connecting
 
@@ -76,7 +78,7 @@ PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration\
 4. Restart Power BI Desktop.
 5. **Get Data → More... → Online Services → DocuSign eSignature**, then enter `Demo` (and optionally `accountId` — see "Connecting" above).
 6. Sign in with a DocuSign Demo account when prompted (OAuth browser dialog).
-7. In Navigator, select any of the eight tables (**Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Accounts**) and load. Only the tables you actually select trigger their corresponding API calls (Navigator data is lazy).
+7. In the table navigator, select any of the eleven tables (**Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Agreements**, **Parties**, **CustomField**, **Accounts**) and load. Only the tables you actually select trigger their corresponding API calls (navigation data is lazy).
 
 ## Power BI Service / on-premises gateway installation
 
