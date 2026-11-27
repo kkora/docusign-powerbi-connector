@@ -6,7 +6,7 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation PBI_QueryOrder = ["Envelopes","Recipients","Envelope Status","Envelope Custom Fields","Envelope Audit Events","Templates","Envelope Documents","Accounts"]
+annotation PBI_QueryOrder = ["Environment","AccountId","Envelopes","Recipients","Envelope Status","Envelope Custom Fields","Envelope Audit Events","Templates","Envelope Documents","Accounts"]
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
@@ -20,4 +20,7 @@ ref table 'Envelope Audit Events'
 ref table Templates
 ref table 'Envelope Documents'
 ref table Accounts
+
+ref expression Environment
+ref expression AccountId
 

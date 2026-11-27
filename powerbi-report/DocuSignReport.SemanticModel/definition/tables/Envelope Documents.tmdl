@@ -73,7 +73,7 @@ table 'Envelope Documents'
 		mode: import
 		source =
 				let
-				    Source = DocuSignPowerBI.Contents("Demo", null, null, null),
+				    Source = DocuSignPowerBI.Contents(Environment, null, null, AccountId),
 				    Data = Source{[Name="Envelope Documents"]}[Data]
 				in
 				    Data
