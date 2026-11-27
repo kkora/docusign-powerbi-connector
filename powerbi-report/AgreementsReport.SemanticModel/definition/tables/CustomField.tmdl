@@ -1,0 +1,45 @@
+table CustomField
+	lineageTag: c81a1426-9e9f-408c-be05-85fb499d864f
+
+	column AccountId
+		dataType: string
+		lineageTag: c8e80225-3071-4554-92fe-66d96a369e8d
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgreementId
+		dataType: string
+		lineageTag: a67c1069-810b-408a-85b9-1eed8d9adecd
+		summarizeBy: none
+		sourceColumn: AgreementId
+
+		annotation SummarizationSetBy = Automatic
+
+	column FieldName
+		dataType: string
+		lineageTag: e046452f-712f-446b-a25e-4192187e210d
+		summarizeBy: none
+		sourceColumn: FieldName
+
+		annotation SummarizationSetBy = Automatic
+
+	column FieldValue
+		dataType: string
+		lineageTag: 7c0b3ed7-2699-40f6-8a51-deffcd6a13d1
+		summarizeBy: none
+		sourceColumn: FieldValue
+
+		annotation SummarizationSetBy = Automatic
+
+	partition CustomField = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents(Environment, AccountId),
+				    Data = Source{[Name="CustomField"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

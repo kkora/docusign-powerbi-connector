@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "b2d50202",
+  "position": {
+    "x": 512,
+    "y": 20,
+    "z": 0,
+    "height": 110,
+    "width": 232,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "Expiring Soon (Non-Renewing) Count"
+                }
+              },
+              "queryRef": "Agreements.Expiring Soon (Non-Renewing) Count",
+              "nativeQueryRef": "Expiring Soon (Non-Renewing) Count"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

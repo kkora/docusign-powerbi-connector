@@ -1,0 +1,49 @@
+table Parties
+	lineageTag: 97b7f023-aedf-4fca-87d8-7dde42a4ed69
+
+	measure 'Total Parties' = COALESCE(DISTINCTCOUNT(Parties[PartyName]), 0)
+		formatString: #,0
+		lineageTag: fbd21d02-b209-4f0b-8cac-3f5f71069996
+
+	column AccountId
+		dataType: string
+		lineageTag: 3b1a71eb-731d-4a2f-96b7-7ec5f067ee2c
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgreementId
+		dataType: string
+		lineageTag: 289e06cf-14b2-4f87-ae62-06745dac1084
+		summarizeBy: none
+		sourceColumn: AgreementId
+
+		annotation SummarizationSetBy = Automatic
+
+	column PartyId
+		dataType: string
+		lineageTag: 20729474-7855-49f0-b5e0-d441ba9b9129
+		summarizeBy: none
+		sourceColumn: PartyId
+
+		annotation SummarizationSetBy = Automatic
+
+	column PartyName
+		dataType: string
+		lineageTag: 36424afd-2d50-4968-ab72-9f4d0c8cc2ca
+		summarizeBy: none
+		sourceColumn: PartyName
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Parties = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents(Environment, AccountId),
+				    Data = Source{[Name="Parties"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

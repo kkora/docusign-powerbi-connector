@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "a1c40102",
+  "position": {
+    "x": 524,
+    "y": 20,
+    "z": 0,
+    "height": 110,
+    "width": 232,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "Agreements Expiring Next 90 Days"
+                }
+              },
+              "queryRef": "Agreements.Agreements Expiring Next 90 Days",
+              "nativeQueryRef": "Agreements Expiring Next 90 Days"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -5,9 +5,11 @@ Build a second, source-controlled Power BI report (`powerbi-report/AgreementsRep
 sample, powered by our own `DocuSignPowerBI` connector, and shipped through the existing
 `dist\` packaging pipeline as `AgreementsReport.pbit`.
 
-Status: **Phase 1 complete (2026-11-27)** — connector v1.3.0 ships the `Agreements`/`Parties`/`CustomField`
-tables (Navigator scope, ctoken pagination, ISO-duration helper, 46 new test Facts; 184/184 total pass —
-see TEST-RESULTS.md "v1.3.0"). Phase 0 results in §5. Next: Phase 2 (AgreementsReport.pbip).
+Status: **Phase 2 authored (2026-11-27), pending Desktop verification** — `powerbi-report/AgreementsReport.pbip`
+exists (PBIR + TMDL: 5 tables, 15 measures, 2 pages / 17 visuals, Eda theme; all JSON parses and every visual
+field reference machine-checked against the model — see powerbi-report/README.md "AgreementsReport").
+Phase 1 (connector v1.3.0, 184/184 Facts) and Phase 0 (§5) complete. Next: open in Desktop, live refresh,
+then Phase 3 (export .pbit + packaging).
 
 ---
 

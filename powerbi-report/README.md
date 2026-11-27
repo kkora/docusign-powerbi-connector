@@ -2,6 +2,8 @@
 
 A Power BI Project (`.pbip`) built on top of the `DocuSignPowerBI` connector, covering all 8 Navigator tables: Envelopes, Recipients, Envelope Status, Envelope Custom Fields, Envelope Audit Events, Templates, Envelope Documents, Accounts.
 
+This folder also contains a second, independent project — **`AgreementsReport.pbip`** — covering the connector's DocuSign Navigator agreement tables; see [AgreementsReport](#agreementsreport-power-bi-project) below.
+
 ## Verification status
 
 **Verified working in Power BI Desktop 2.159 (October 2026) on 2026-11-24**: the `.pbip` opens, the semantic model loads all 8 tables, and the report renders all 3 pages / 17 visuals with data matching the live Demo account (2 envelopes, 1 template, 2 accounts — same counts as the connector's live verification in [TEST-RESULTS.md](../TEST-RESULTS.md)).
@@ -87,3 +89,38 @@ Rendered in Power BI Desktop (2026-11-24, live Demo-account data):
 - 2 **Card** visuals: `Envelope Documents[Total Documents]`, `Templates[Shared Templates %]`.
 - **Table**: `Templates[TemplateName, OwnerName, Shared, CreatedDateTime]`.
 - **Table**: `Envelope Custom Fields[FieldName, FieldValue, FieldType, Required]`.
+
+## AgreementsReport (Power BI Project)
+
+A second, independent `.pbip` (`AgreementsReport.pbip` → `AgreementsReport.Report` + `AgreementsReport.SemanticModel`) over the connector's three DocuSign **Navigator** agreement tables added in v1.3.0. Its design is ported from DocuSign's official "PowerBI Agreements Report" cloud template (analyzed in [AGREEMENTS-REPORT-PLAN.md](../AGREEMENTS-REPORT-PLAN.md)), rebuilt in source-controlled PBIR/TMDL rather than rebinding the legacy-format `.pbit`.
+
+### Verification status
+
+**Authored 2026-11-27, not yet opened in Power BI Desktop.** All 24 JSON files parse, every visual field reference was machine-checked against the TMDL model (99 fields), and the three PBIR pitfalls documented above (version `2.0.0`, `themeCollection`, TMDL tab indentation) were applied from the start. Desktop open + live refresh is the remaining verification step.
+
+### Semantic model
+
+Parameters `Environment` (`Demo`/`Production`) and `AccountId` — same pattern as DocuSignReport; the Navigator tables require the account to have DocuSign Navigator provisioned (on this project's Demo tenant that is the `njeda` account only).
+
+| Table | Source | Notes |
+|---|---|---|
+| Agreements | connector `Agreements` | all 67 connector columns, 14 measures |
+| Parties | connector `Parties` | `Total Parties` measure |
+| CustomField | connector `CustomField` | empty unless Navigator custom fields are defined |
+| Date | M-generated calendar (2010 → today+10y) | **disconnected** — used via `MIN`/`MAX` filter context in measures, matching the official template's pattern |
+| Agreement Status Breakdown | static 3-row M table | drives the status donut via `Dynamic Status Count` |
+
+Relationships: `Parties[AgreementId] → Agreements[Id]`, `CustomField[AgreementId] → Agreements[Id]` (many-to-one, single direction).
+
+Measures (ported from the official template, all `COALESCE`-wrapped; `Fiscal_*`, `IsTrashed`, and Obligations/Tickets measures were not ported — their columns/tables have no public-API source): `Agreements`, `Active Agreements`, `Agreements Expiring Next 90 Days`, `Agreements Due for Renewal Next 90 Days`, `Termination Notice Deadlines`, `All Expired Agreements`, `All Pending Renewal`, `All Active Agreements Without Renewals`, `Renewing Soon Count`, `Expiring Soon (Non-Renewing) Count`, `Dynamic Status Count`, `ActiveAgreementsCount`, `AutoRenewalAgreementsCount`, `Total Contract Value`, `Total Parties`.
+
+### Report pages (Eda theme, same as DocuSignReport)
+
+| Page | Visuals |
+|---|---|
+| Agreements Overview | 5 KPI cards (total / active / expiring 90d / renewal due 90d / total value), status-breakdown donut, Agreements by Type, Agreements by Party (via the Parties relationship), agreement detail table |
+| Renewals & Deadlines | RenewalType slicer, 4 cards (renewing soon / expiring non-renewing / pending renewal / expired), Expirations by Year, Agreements by Governing Law, renewal-pipeline table (notice dates, termination deadlines) |
+
+### Opening it
+
+Same steps as DocuSignReport: **File → Open report → Browse** → `AgreementsReport.pbip`, sign in to DocuSign (the credential must have been granted the Navigator scope — clear and re-enter a credential saved before connector v1.3.0), refresh. Leave `AccountId` blank to use the default (`njeda`) account.

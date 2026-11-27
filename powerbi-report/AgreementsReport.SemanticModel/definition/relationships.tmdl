@@ -1,0 +1,7 @@
+relationship 89ea1bb5-0320-4cbd-bf37-ebaa81aa543c
+	fromColumn: Parties.AgreementId
+	toColumn: Agreements.Id
+
+relationship 43eafb9d-8702-43c3-9f10-c8b026eee37e
+	fromColumn: CustomField.AgreementId
+	toColumn: Agreements.Id

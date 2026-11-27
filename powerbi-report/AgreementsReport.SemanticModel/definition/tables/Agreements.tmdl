@@ -1,0 +1,712 @@
+table Agreements
+	lineageTag: 22689cfd-e43d-42de-a928-47361e04341b
+
+	measure Agreements = COALESCE(COUNTROWS('Agreements'), 0)
+		formatString: #,0
+		lineageTag: 35a3bd80-9e54-4177-9520-83082b88f592
+
+	measure 'Active Agreements' =
+			CALCULATE(
+			    COALESCE(COUNTROWS('Agreements'), 0),
+			    VAR LastDayOfPeriod = MAX('Date'[Date])
+			    RETURN
+			    FILTER(
+			        'Agreements',
+			        NOT ( ISBLANK('Agreements'[EffectiveDate]) && ISBLANK('Agreements'[ExpirationDate]) )
+			        && ( ISBLANK('Agreements'[EffectiveDate]) || 'Agreements'[EffectiveDate] <= LastDayOfPeriod )
+			        && ( ISBLANK('Agreements'[ExpirationDate]) || 'Agreements'[ExpirationDate] > LastDayOfPeriod )
+			    )
+			)
+		formatString: #,0
+		lineageTag: cfdf08cd-0eab-48d4-8ed0-b13a69e93c54
+
+	measure 'Agreements Expiring Next 90 Days' = COALESCE(SUM('Agreements'[IsExpiringIn90days]), 0)
+		formatString: #,0
+		lineageTag: 1a6bc89b-181b-4eff-aac5-96de7f4cb4f2
+
+	measure 'Agreements Due for Renewal Next 90 Days' = COALESCE(SUM('Agreements'[IsRenewingIn90days]), 0)
+		formatString: #,0
+		lineageTag: c7fde25c-3d0a-4942-b6db-476389241513
+
+	measure 'Termination Notice Deadlines' =
+			COALESCE(
+			    CALCULATE(
+			        COUNTROWS('Agreements'),
+			        FILTER(
+			            'Agreements',
+			            'Agreements'[TerminationNoticeDueDate] >= MIN('Date'[Date]) &&
+			            'Agreements'[TerminationNoticeDueDate] <= MAX('Date'[Date])
+			        )
+			    ),
+			0)
+		formatString: #,0
+		lineageTag: ea6da5e9-1464-44d7-a521-287f804ebb55
+
+	measure 'All Expired Agreements' =
+			VAR TodayDate = TODAY()
+			RETURN
+			COALESCE(
+			    CALCULATE(
+			        COUNTROWS('Agreements'),
+			        FILTER(
+			            'Agreements',
+			            NOT ISBLANK('Agreements'[ExpirationDate]) &&
+			            'Agreements'[ExpirationDate] < TodayDate
+			        )
+			    ),
+			0)
+		formatString: #,0
+		lineageTag: 20687f09-dc3e-4fc4-9e5d-12e89b0c6332
+
+	measure 'All Pending Renewal' =
+			VAR TodayDate = TODAY()
+			RETURN
+			COALESCE(
+			    CALCULATE(
+			        COUNTROWS('Agreements'),
+			        FILTER(
+			            'Agreements',
+			            NOT ISBLANK('Agreements'[RenewalNoticeDate])
+			            && ( ISBLANK('Agreements'[ExpirationDate]) || 'Agreements'[ExpirationDate] > TodayDate )
+			        )
+			    ),
+			0)
+		formatString: #,0
+		lineageTag: d0df789e-7b39-4ef8-830b-91cdd99f46a2
+
+	measure 'All Active Agreements Without Renewals' =
+			VAR TodayDate = TODAY()
+			VAR TotalActiveAgreements =
+			    CALCULATE(
+			        COUNTROWS('Agreements'),
+			        FILTER(
+			            'Agreements',
+			            NOT ( ISBLANK('Agreements'[EffectiveDate]) && ISBLANK('Agreements'[ExpirationDate]) )
+			            && ( ISBLANK('Agreements'[EffectiveDate]) || 'Agreements'[EffectiveDate] <= TodayDate )
+			            && ( ISBLANK('Agreements'[ExpirationDate]) || 'Agreements'[ExpirationDate] >= TodayDate )
+			        )
+			    )
+			VAR AgreementsPendingRenewal = [All Pending Renewal]
+			RETURN
+			COALESCE(TotalActiveAgreements - AgreementsPendingRenewal, 0)
+		formatString: #,0
+		lineageTag: 8a7fe27c-db83-496c-924d-8de8fc01f796
+
+	measure 'Renewing Soon Count' = COALESCE(SUM('Agreements'[IsRenewingIn90days]), 0)
+		formatString: #,0
+		lineageTag: 6af16978-7fa8-4508-af2d-39979ec29bec
+
+	measure 'Expiring Soon (Non-Renewing) Count' =
+			VAR TodayDate = TODAY()
+			VAR NinetyDaysOut = TodayDate + 90
+			RETURN
+			COALESCE(
+			    CALCULATE(
+			        COUNTROWS('Agreements'),
+			        FILTER(
+			            'Agreements',
+			            'Agreements'[ExpirationDate] >= TodayDate &&
+			            'Agreements'[ExpirationDate] <= NinetyDaysOut
+			            && ISBLANK('Agreements'[RenewalNoticeDate])
+			        )
+			    ),
+			0)
+		formatString: #,0
+		lineageTag: 8cd6ff39-6ddd-4eac-9e1e-e923fd776931
+
+	measure 'Dynamic Status Count' =
+			VAR SelectedStatus = SELECTEDVALUE('Agreement Status Breakdown'[Status])
+			RETURN
+			SWITCH(
+			    SelectedStatus,
+			    "Expired", [All Expired Agreements],
+			    "Pending Renewal", [All Pending Renewal],
+			    "Active (Non-Renewal)", [All Active Agreements Without Renewals],
+			    BLANK()
+			)
+		formatString: #,0
+		lineageTag: 021cb256-4765-4b02-b5c6-9ed5e1208a48
+
+	measure ActiveAgreementsCount = COALESCE(SUM('Agreements'[IsActive]), 0)
+		formatString: #,0
+		lineageTag: 2f6530dc-fc31-49ce-83f6-1382d3922b6e
+
+	measure AutoRenewalAgreementsCount = COALESCE(CALCULATE(COUNTROWS('Agreements'), 'Agreements'[IsAutoRenewal] = TRUE), 0)
+		formatString: #,0
+		lineageTag: daf30a5f-f7c6-4503-9933-925f2818fc34
+
+	measure 'Total Contract Value' = COALESCE(SUM('Agreements'[TotalValue]), 0)
+		formatString: \$#,0
+		lineageTag: c8c42d79-04b3-4149-9f2f-c29e760c60c5
+
+	column AccountId
+		dataType: string
+		lineageTag: e076f81b-a580-4993-9c60-80c9773fd762
+		summarizeBy: none
+		sourceColumn: AccountId
+
+		annotation SummarizationSetBy = Automatic
+
+	column Id
+		dataType: string
+		lineageTag: 4b09e8c1-374d-45f0-a2f0-a02a17aaf5be
+		summarizeBy: none
+		sourceColumn: Id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Title
+		dataType: string
+		lineageTag: ee0a4579-31f3-4050-8fcc-ffb367c87817
+		summarizeBy: none
+		sourceColumn: Title
+
+		annotation SummarizationSetBy = Automatic
+
+	column FileName
+		dataType: string
+		lineageTag: 47df4ff8-737f-4dd0-97f1-7c5b52c4643c
+		summarizeBy: none
+		sourceColumn: FileName
+
+		annotation SummarizationSetBy = Automatic
+
+	column DocumentId
+		dataType: string
+		lineageTag: 880aa152-59b8-4143-ae21-caee67203d7c
+		summarizeBy: none
+		sourceColumn: DocumentId
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgreementType
+		dataType: string
+		lineageTag: 90637c21-9d43-4cb1-b141-376a47e1af1b
+		summarizeBy: none
+		sourceColumn: AgreementType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 94e9b9ca-3d08-4154-ade9-693a6fc21bab
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 30b01034-4fd9-458b-a6de-bbf828e0710a
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReviewStatus
+		dataType: string
+		lineageTag: 623f5f05-a9b4-4449-ab52-92f886e61978
+		summarizeBy: none
+		sourceColumn: ReviewStatus
+
+		annotation SummarizationSetBy = Automatic
+
+	column Languages
+		dataType: string
+		lineageTag: c67de489-4ef9-4de5-bbfa-3e4e7aa9cde7
+		summarizeBy: none
+		sourceColumn: Languages
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceName
+		dataType: string
+		lineageTag: 7871ee27-7e2c-49e0-932f-0e2475694a1d
+		summarizeBy: none
+		sourceColumn: SourceName
+
+		annotation SummarizationSetBy = Automatic
+
+	column SourceId
+		dataType: string
+		lineageTag: cef40931-183a-4797-ae00-a4930f9b8315
+		summarizeBy: none
+		sourceColumn: SourceId
+
+		annotation SummarizationSetBy = Automatic
+
+	column EnvelopeId
+		dataType: string
+		lineageTag: e34da133-2a73-41c5-b3d2-103618a89ecd
+		summarizeBy: none
+		sourceColumn: EnvelopeId
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8eb0e230-cb4b-4f95-bf7d-2f40105e0924
+		summarizeBy: none
+		sourceColumn: CreatedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ModifiedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 548ce23e-51a5-4093-9b30-98d4015dac9a
+		summarizeBy: none
+		sourceColumn: ModifiedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column EffectiveDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2b3287b6-bc16-4fbc-bb49-34a00c524749
+		summarizeBy: none
+		sourceColumn: EffectiveDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExpirationDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b63e32b5-d517-4679-ae7e-4fe48aeba1d9
+		summarizeBy: none
+		sourceColumn: ExpirationDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExecutionDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 05a3cefc-998d-4992-9a47-f9be1abbd752
+		summarizeBy: none
+		sourceColumn: ExecutionDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column TermLength
+		dataType: string
+		lineageTag: 97cd2d9f-0237-4d42-b100-91df0889e717
+		summarizeBy: none
+		sourceColumn: TermLength
+
+		annotation SummarizationSetBy = Automatic
+
+	column TermLengthDays
+		dataType: double
+		lineageTag: 357d5a8b-ed62-4348-b273-2870cf96285c
+		summarizeBy: none
+		sourceColumn: TermLengthDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalType
+		dataType: string
+		lineageTag: cb52ba62-5029-475e-b098-0b77b20bada5
+		summarizeBy: none
+		sourceColumn: RenewalType
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsAutoRenewal
+		dataType: boolean
+		lineageTag: e31fee98-41ed-4c6a-9aee-d6bcafd2f0d2
+		summarizeBy: none
+		sourceColumn: IsAutoRenewal
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalTerm
+		dataType: string
+		lineageTag: 76c52e55-99e7-4cfb-8243-d58ad6d998de
+		summarizeBy: none
+		sourceColumn: RenewalTerm
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalTermDays
+		dataType: double
+		lineageTag: 3fa090dd-2c7f-40c8-819a-b59d0926a12c
+		summarizeBy: none
+		sourceColumn: RenewalTermDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalNoticePeriod
+		dataType: string
+		lineageTag: 514a240a-93b8-4bfc-a9c1-c72011186537
+		summarizeBy: none
+		sourceColumn: RenewalNoticePeriod
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalNoticePeriodDays
+		dataType: double
+		lineageTag: f4443508-bf6e-41a2-85cf-401c6c911979
+		summarizeBy: none
+		sourceColumn: RenewalNoticePeriodDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalNoticeDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 21843b60-47e8-40e7-8344-c0b9e13c683a
+		summarizeBy: none
+		sourceColumn: RenewalNoticeDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalOwner
+		dataType: string
+		lineageTag: 7394d5e4-2426-4c35-be66-c5d29a06c81e
+		summarizeBy: none
+		sourceColumn: RenewalOwner
+
+		annotation SummarizationSetBy = Automatic
+
+	column TerminationForCauseNoticePeriod
+		dataType: string
+		lineageTag: ef295eb1-6468-45ab-8a97-fbd7b51e6d60
+		summarizeBy: none
+		sourceColumn: TerminationForCauseNoticePeriod
+
+		annotation SummarizationSetBy = Automatic
+
+	column TerminationForCauseNoticePeriodDays
+		dataType: double
+		lineageTag: 17c8e5f9-6b56-467e-bf73-288c914d515f
+		summarizeBy: none
+		sourceColumn: TerminationForCauseNoticePeriodDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column TerminationForConvenienceNoticePeriod
+		dataType: string
+		lineageTag: 96760332-960e-427b-8a9f-282497d60e13
+		summarizeBy: none
+		sourceColumn: TerminationForConvenienceNoticePeriod
+
+		annotation SummarizationSetBy = Automatic
+
+	column TerminationForConvenienceNoticePeriodDays
+		dataType: double
+		lineageTag: 33987237-93df-4310-bbde-c454609eff8f
+		summarizeBy: none
+		sourceColumn: TerminationForConvenienceNoticePeriodDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column TerminationNoticeDueDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 76868064-856a-4301-9094-e700ee5e6982
+		summarizeBy: none
+		sourceColumn: TerminationNoticeDueDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column PaymentTerms
+		dataType: string
+		lineageTag: 2573a2c1-0a78-430d-8544-695ed56f392e
+		summarizeBy: none
+		sourceColumn: PaymentTerms
+
+		annotation SummarizationSetBy = Automatic
+
+	column LatePaymentFee
+		dataType: boolean
+		lineageTag: 7df1be4d-d265-4b64-91f1-6b15657c0b1c
+		summarizeBy: none
+		sourceColumn: LatePaymentFee
+
+		annotation SummarizationSetBy = Automatic
+
+	column LatePaymentFeePercent
+		dataType: double
+		lineageTag: 2041d5ce-75d9-4ef9-a093-87864c0742f7
+		summarizeBy: none
+		sourceColumn: LatePaymentFeePercent
+
+		annotation SummarizationSetBy = Automatic
+
+	column LiabilityCapDuration
+		dataType: string
+		lineageTag: 0a150eb1-bb84-48c5-ba00-f92ba91e241d
+		summarizeBy: none
+		sourceColumn: LiabilityCapDuration
+
+		annotation SummarizationSetBy = Automatic
+
+	column LiabilityCapDurationDays
+		dataType: double
+		lineageTag: 4263232c-7fab-4c67-811a-4f92e0720a2b
+		summarizeBy: none
+		sourceColumn: LiabilityCapDurationDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column LiabilityCapFixedAmount
+		dataType: double
+		lineageTag: 042f55ae-6fde-4c79-8cdd-da225a1f75da
+		summarizeBy: none
+		sourceColumn: LiabilityCapFixedAmount
+
+		annotation SummarizationSetBy = Automatic
+
+	column LiabilityCapFixedAmountCurrency
+		dataType: string
+		lineageTag: ec516570-202e-4f7d-ad5c-81ff6486dd41
+		summarizeBy: none
+		sourceColumn: LiabilityCapFixedAmountCurrency
+
+		annotation SummarizationSetBy = Automatic
+
+	column LiabilityCapMultiplier
+		dataType: double
+		lineageTag: 1d411122-895d-4acc-a99c-fc72e350f307
+		summarizeBy: none
+		sourceColumn: LiabilityCapMultiplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column PriceCapIncreasePercent
+		dataType: double
+		lineageTag: 1cc3d3c0-b5e8-40fa-ab68-b2f61e0d8032
+		summarizeBy: none
+		sourceColumn: PriceCapIncreasePercent
+
+		annotation SummarizationSetBy = Automatic
+
+	column TotalValue
+		dataType: double
+		formatString: #,0
+		lineageTag: 265af32b-76d8-4124-926d-c35ce2f553c3
+		summarizeBy: none
+		sourceColumn: TotalValue
+
+		annotation SummarizationSetBy = Automatic
+
+	column TotalValueCurrency
+		dataType: string
+		lineageTag: fc84ea6a-a5c1-4f4d-8416-f109ccf0e730
+		summarizeBy: none
+		sourceColumn: TotalValueCurrency
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnnualContractValue
+		dataType: double
+		formatString: #,0
+		lineageTag: df6e5a35-ccb2-4585-8034-fd9a33361a4c
+		summarizeBy: none
+		sourceColumn: AnnualContractValue
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnnualContractValueCurrency
+		dataType: string
+		lineageTag: 5e7591b0-b6e4-4cf0-9ae7-bdc7dda41cd2
+		summarizeBy: none
+		sourceColumn: AnnualContractValueCurrency
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignment
+		dataType: string
+		lineageTag: 0fdfe6ee-f4b7-40f0-ad9f-5a826ee53824
+		summarizeBy: none
+		sourceColumn: Assignment
+
+		annotation SummarizationSetBy = Automatic
+
+	column AssignmentChangeOfControl
+		dataType: string
+		lineageTag: 7a6232ca-f356-4fe0-9be5-d36b57d2e924
+		summarizeBy: none
+		sourceColumn: AssignmentChangeOfControl
+
+		annotation SummarizationSetBy = Automatic
+
+	column AssignmentTerminationRights
+		dataType: string
+		lineageTag: af80eb43-cb4e-4dc9-a218-d2310efe0771
+		summarizeBy: none
+		sourceColumn: AssignmentTerminationRights
+
+		annotation SummarizationSetBy = Automatic
+
+	column GoverningLaw
+		dataType: string
+		lineageTag: 550ac023-a144-4036-b75f-1af3a01adf6d
+		summarizeBy: none
+		sourceColumn: GoverningLaw
+
+		annotation SummarizationSetBy = Automatic
+
+	column Jurisdiction
+		dataType: string
+		lineageTag: f8009b29-a74d-4c75-8037-57164584e501
+		summarizeBy: none
+		sourceColumn: Jurisdiction
+
+		annotation SummarizationSetBy = Automatic
+
+	column NdaType
+		dataType: string
+		lineageTag: be5cee85-3f5f-4c1a-8a28-3685d69bb1ce
+		summarizeBy: none
+		sourceColumn: NdaType
+
+		annotation SummarizationSetBy = Automatic
+
+	column ConfidentialityObligationPeriod
+		dataType: string
+		lineageTag: a22a2cf0-1d42-4571-b156-190f1f160b11
+		summarizeBy: none
+		sourceColumn: ConfidentialityObligationPeriod
+
+		annotation SummarizationSetBy = Automatic
+
+	column ConfidentialityObligationPeriodDays
+		dataType: double
+		lineageTag: b3c0acc3-f10c-4ab5-acdd-af0a71a61549
+		summarizeBy: none
+		sourceColumn: ConfidentialityObligationPeriodDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsActive
+		dataType: int64
+		lineageTag: 437333df-e89f-48c6-883b-8702bc20b008
+		summarizeBy: none
+		sourceColumn: IsActive
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsActiveIn30days
+		dataType: int64
+		lineageTag: 51a4db45-5008-4933-9b7e-37ac5ee1bf5d
+		summarizeBy: none
+		sourceColumn: IsActiveIn30days
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsExpiringIn30days
+		dataType: int64
+		lineageTag: 418fdd74-a060-4292-8115-5a4f8de6e295
+		summarizeBy: none
+		sourceColumn: IsExpiringIn30days
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsRenewingIn30days
+		dataType: int64
+		lineageTag: e5cb51cf-26ff-4c6e-89d5-12bc15cfb8aa
+		summarizeBy: none
+		sourceColumn: IsRenewingIn30days
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsTakingEffectIn30days
+		dataType: int64
+		lineageTag: aed09d72-db84-4fbc-b51f-405a3977f89e
+		summarizeBy: none
+		sourceColumn: IsTakingEffectIn30days
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsActiveIn90days
+		dataType: int64
+		lineageTag: 7a1220f6-0e72-4b12-928a-36707f1c1141
+		summarizeBy: none
+		sourceColumn: IsActiveIn90days
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsExpiringIn90days
+		dataType: int64
+		lineageTag: 6657b724-e5a4-42a4-85f2-566c0356b8aa
+		summarizeBy: none
+		sourceColumn: IsExpiringIn90days
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsRenewingIn90days
+		dataType: int64
+		lineageTag: 716f726f-b68f-469a-bf89-a30190050584
+		summarizeBy: none
+		sourceColumn: IsRenewingIn90days
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsTakingEffectIn90days
+		dataType: int64
+		lineageTag: eaf52aa6-a263-4c0a-84b8-e1c46661254d
+		summarizeBy: none
+		sourceColumn: IsTakingEffectIn90days
+
+		annotation SummarizationSetBy = Automatic
+
+	column EffectiveYearNumber
+		dataType: int64
+		lineageTag: 09d6d21e-92f6-475c-b565-cf34c2868943
+		summarizeBy: none
+		sourceColumn: EffectiveYearNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExpirationYearNumber
+		dataType: int64
+		lineageTag: 2a9f2580-dc2c-456e-af73-096f68e5c0ac
+		summarizeBy: none
+		sourceColumn: ExpirationYearNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExecutionYearNumber
+		dataType: int64
+		lineageTag: be753937-486d-41a1-a068-6a05adea8da0
+		summarizeBy: none
+		sourceColumn: ExecutionYearNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column RenewalNoticeYearNumber
+		dataType: int64
+		lineageTag: 70564823-88c0-4920-b45f-3e7ef10890a6
+		summarizeBy: none
+		sourceColumn: RenewalNoticeYearNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column EffectiveMonthYear
+		dataType: string
+		lineageTag: 76c155be-73a6-42f9-81df-b2f4ea8fc79a
+		summarizeBy: none
+		sourceColumn: EffectiveMonthYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExpirationMonthYear
+		dataType: string
+		lineageTag: 3751f7eb-b96c-471e-8506-6431cf31b9d4
+		summarizeBy: none
+		sourceColumn: ExpirationMonthYear
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Agreements = m
+		mode: import
+		source =
+				let
+				    Source = DocuSignPowerBI.Contents(Environment, AccountId),
+				    Data = Source{[Name="Agreements"]}[Data]
+				in
+				    Data
+
+	annotation PBI_ResultType = Table

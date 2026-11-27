@@ -1,0 +1,20 @@
+table 'Agreement Status Breakdown'
+	lineageTag: 71d027ab-b7e8-4a9b-a88c-8a41bd52bea0
+
+	column Status
+		dataType: string
+		lineageTag: c47d1486-b3fc-4689-b250-99f027a7d1fe
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Agreement Status Breakdown' = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Status = text], {{"Expired"}, {"Pending Renewal"}, {"Active (Non-Renewal)"}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

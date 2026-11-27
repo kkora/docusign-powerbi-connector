@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "b2d50207",
+  "position": {
+    "x": 260,
+    "y": 420,
+    "z": 0,
+    "height": 280,
+    "width": 1000,
+    "tabOrder": 7
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "Title"
+                }
+              },
+              "queryRef": "Agreements.Title",
+              "nativeQueryRef": "Title"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "RenewalType"
+                }
+              },
+              "queryRef": "Agreements.RenewalType",
+              "nativeQueryRef": "RenewalType"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "RenewalNoticeDate"
+                }
+              },
+              "queryRef": "Agreements.RenewalNoticeDate",
+              "nativeQueryRef": "RenewalNoticeDate"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "ExpirationDate"
+                }
+              },
+              "queryRef": "Agreements.ExpirationDate",
+              "nativeQueryRef": "ExpirationDate"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "TerminationNoticeDueDate"
+                }
+              },
+              "queryRef": "Agreements.TerminationNoticeDueDate",
+              "nativeQueryRef": "TerminationNoticeDueDate"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "RenewalNoticePeriodDays"
+                }
+              },
+              "queryRef": "Agreements.RenewalNoticePeriodDays",
+              "nativeQueryRef": "RenewalNoticePeriodDays"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Renewal Pipeline'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

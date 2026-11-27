@@ -1,0 +1,9 @@
+expression Environment = "Demo" meta [IsParameterQuery=true, List={"Demo", "Production"}, DefaultValue="Demo", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8aa5725d-36bb-4678-8bca-9a7d46065c9e
+
+	annotation PBI_ResultType = Text
+
+expression AccountId = null meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=false]
+	lineageTag: d985ae99-451c-41e7-8336-7affca67fec7
+
+	annotation PBI_ResultType = Null
