@@ -474,7 +474,7 @@ Content-Type: application/json
         "annual_agreement_value": 240000,
         "annual_agreement_value_currency_code": "USD"
       },
-      "custom_provisions": { "department": "Legal", "lease_deposit": 17500 },
+      "custom_provisions": { "c_Department_cOtkJt": "legal", "c_LeaseDeposit_G75EQU": 17500 },
       "languages": ["en"],
       "source_name": "UploadCenter",
       "source_id": "doc-msa-1",

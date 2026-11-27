@@ -1,25 +1,738 @@
 ﻿{
     "response_metadata":  {
-                              "page_limit":  20,
-                              "request_id":  "0HNQAG15TFV6V:0000023E",
-                              "response_timestamp":  "2026-11-27T03:49:22.5813049Z",
-                              "response_duration_ms":  564
+                              "page_limit":  50,
+                              "request_id":  "0HNQAG15LTD9J:00000149",
+                              "response_timestamp":  "2026-11-27T16:44:08.6861438Z",
+                              "response_duration_ms":  501
                           },
     "_links":  {
                    "first":  {
-                                 "href":  "/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreements?limit=20"
+                                 "href":  "/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreements?limit=50"
                              },
                    "self":  {
-                                "href":  "/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreements?limit=20"
+                                "href":  "/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreements?limit=100"
                             }
                },
     "data":  [
                  {
                      "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.885781+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:32.395988+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/897ac432-25c8-4d30-b4d0-3a1b948beda7"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "ac7a3171-c861-46fe-ab8b-9ab0f130c131",
+                     "title":  "Supply Agreement",
+                     "file_name":  "Supply Agreement - Pinelands Paper Company.docx",
+                     "document_id":  "897ac432-25c8-4d30-b4d0-3a1b948beda7",
+                     "type":  "Distribution",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "045e8b6a-1fd1-4db4-ae08-e53c7d5718c1",
+                                         "name_in_agreement":  "Pinelands Paper Company"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2024-01-01T00:00:00",
+                                        "expiration_date":  "2025-12-31T00:00:00",
+                                        "execution_date":  "2023-12-12T00:00:00",
+                                        "term_length":  "P2Y",
+                                        "governing_law":  "Laws of the Commonwealth of Pennsylvania",
+                                        "payment_terms_due_date":  "SIXTY_DAYS",
+                                        "renewal_type":  "FIXED_TERM",
+                                        "renewal_notice_date":  "2025-12-31T00:00:00",
+                                        "termination_period_for_convenience":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "897ac432-25c8-4d30-b4d0-3a1b948beda7",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.859541+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:31:59.475684+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/3cefd424-94a5-473f-9746-3d334866d11b"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "585065d3-b5d8-4311-b3b7-d15e0b23934d",
+                     "title":  "Non-Disclosure Agreement (Unilateral)",
+                     "file_name":  "Unilateral NDA - Beacon Capital Partners.docx",
+                     "document_id":  "3cefd424-94a5-473f-9746-3d334866d11b",
+                     "type":  "Nda",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "ade555d8-dc2a-40cd-8085-2d3b01c38b4f",
+                                         "name_in_agreement":  "Beacon Capital Partners LP"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-11-01T00:00:00",
+                                        "expiration_date":  "2027-10-31T00:00:00",
+                                        "execution_date":  "2026-10-28T00:00:00",
+                                        "term_length":  "P1Y",
+                                        "confidentiality_obligation_period":  "P2Y",
+                                        "governing_law":  "Laws of the State of New York",
+                                        "nda_type":  "ONE_WAY",
+                                        "renewal_type":  "FIXED_TERM",
+                                        "renewal_notice_date":  "2027-10-31T00:00:00"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "3cefd424-94a5-473f-9746-3d334866d11b",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.49133+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:33.603772+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/dba28b9a-7aaf-45a8-8173-b26af1ee7cc0"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "1ad00da1-c7d2-4f10-a9ea-b3f4baf2e78c",
+                     "title":  "Commercial Facilities Lease Agreement",
+                     "file_name":  "Facilities Lease - Newark Innovation Hub.docx",
+                     "document_id":  "dba28b9a-7aaf-45a8-8173-b26af1ee7cc0",
+                     "type":  "Lease",
+                     "category":  "Miscellaneous",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "12649046-2949-4f0a-b9dd-cecc85fc1c7b",
+                                         "name_in_agreement":  "Newark Innovation Hub LLC"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2023-06-01T00:00:00",
+                                        "expiration_date":  "2026-12-31T00:00:00",
+                                        "execution_date":  "2023-05-12T00:00:00",
+                                        "term_length":  "P43M",
+                                        "governing_law":  "Laws of the State of New Jersey",
+                                        "jurisdiction":  "Essex County, New Jersey",
+                                        "payment_terms_due_date":  "OTHER",
+                                        "can_charge_late_payment_fees":  true,
+                                        "late_payment_fee_percent":  5,
+                                        "renewal_type":  "RENEW_OPTION",
+                                        "renewal_notice_period":  "P90D",
+                                        "renewal_notice_date":  "2026-10-02T00:00:00",
+                                        "auto_renewal_term_length":  "P3Y",
+                                        "termination_period_for_cause":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "dba28b9a-7aaf-45a8-8173-b26af1ee7cc0",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.431416+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:31:59.886329+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/ffbfa9dd-63de-465d-8f6c-39a66c9d824a"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "0e6b8fe9-ed23-41f8-adb4-6a05f7356241",
+                     "title":  "Mutual Non-Disclosure Agreement",
+                     "file_name":  "Mutual NDA - Delaware River Logistics.docx",
+                     "document_id":  "ffbfa9dd-63de-465d-8f6c-39a66c9d824a",
+                     "type":  "Nda",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "f7aadc54-1009-4947-8e1f-eeaf10f5a174",
+                                         "name_in_agreement":  "Delaware River Logistics Corp"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-10-01T00:00:00",
+                                        "expiration_date":  "2028-09-30T00:00:00",
+                                        "execution_date":  "2026-09-25T00:00:00",
+                                        "term_length":  "P2Y",
+                                        "confidentiality_obligation_period":  "P3Y",
+                                        "governing_law":  "Laws of the State of New Jersey",
+                                        "jurisdiction":  "Camden County, New Jersey",
+                                        "nda_type":  "MUTUAL",
+                                        "renewal_type":  "FIXED_TERM",
+                                        "renewal_notice_date":  "2028-09-30T00:00:00",
+                                        "termination_period_for_convenience":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "ffbfa9dd-63de-465d-8f6c-39a66c9d824a",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.320744+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:32.63785+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/115c6916-dc1b-427f-a4dc-da5e45b99085"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "8d4a55ca-906f-4893-bc92-b260c2a549ce",
+                     "title":  "Temporary Staffing Services Agreement",
+                     "file_name":  "Staffing Agreement - Capital Temp Services.docx",
+                     "document_id":  "115c6916-dc1b-427f-a4dc-da5e45b99085",
+                     "type":  "ServicesAgreement",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "bbe9e3b6-7a3e-4027-8fcf-712d8ceef585",
+                                         "name_in_agreement":  "Capital Temp Services LLC"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-05-01T00:00:00",
+                                        "expiration_date":  "2027-04-30T00:00:00",
+                                        "execution_date":  "2026-04-14T00:00:00",
+                                        "term_length":  "P1Y",
+                                        "governing_law":  "New Jersey",
+                                        "payment_terms_due_date":  "THIRTY_DAYS",
+                                        "can_charge_late_payment_fees":  true,
+                                        "late_payment_fee_percent":  1,
+                                        "renewal_type":  "AUTO_RENEW",
+                                        "renewal_notice_period":  "P30D",
+                                        "renewal_notice_date":  "2027-03-31T00:00:00",
+                                        "auto_renewal_term_length":  "P6M",
+                                        "termination_period_for_convenience":  "P15D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "115c6916-dc1b-427f-a4dc-da5e45b99085",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.220545+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:32.525356+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/48483df1-0a42-4714-a72b-d5db3849212b"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "ce43c149-3fea-4db1-afa3-2ead786f5da5",
+                     "title":  "Statement Of Work No. 2 - Data Platform Implementation",
+                     "file_name":  "SOW - Data Platform Implementation - BrightPath Consulting.docx",
+                     "document_id":  "48483df1-0a42-4714-a72b-d5db3849212b",
+                     "type":  "Sow",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "0f26eb0b-f480-4e29-a4db-3bc0daefacec",
+                                         "name_in_agreement":  "BrightPath Consulting Inc."
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-06-01T00:00:00",
+                                        "expiration_date":  "2026-12-19T00:00:00",
+                                        "execution_date":  "2026-05-20T00:00:00",
+                                        "term_length":  "P202D",
+                                        "governing_law":  "Laws of the State of New Jersey",
+                                        "payment_terms_due_date":  "THIRTY_DAYS",
+                                        "renewal_type":  "FIXED_TERM",
+                                        "renewal_notice_date":  "2026-12-19T00:00:00",
+                                        "termination_period_for_convenience":  "P15D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "48483df1-0a42-4714-a72b-d5db3849212b",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.201784+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:33.840429+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/f8267f9e-9efc-44cb-b33a-1da163d3c499"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "0f258546-6a79-4ec5-9e7b-f10e9dd7d3c8",
+                     "title":  "Equipment Maintenance And Service Agreement",
+                     "file_name":  "Equipment Maintenance Agreement - Liberty HVAC Services.docx",
+                     "document_id":  "f8267f9e-9efc-44cb-b33a-1da163d3c499",
+                     "type":  "ServicesAgreement",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "37973d2c-b8e4-4587-ab71-4d27a35ebbf7",
+                                         "name_in_agreement":  "Liberty HVAC Services LLC"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2025-04-01T00:00:00",
+                                        "expiration_date":  "2028-03-31T00:00:00",
+                                        "execution_date":  "2025-03-18T00:00:00",
+                                        "term_length":  "P3Y",
+                                        "governing_law":  "New Jersey",
+                                        "payment_terms_due_date":  "FORTY_FIVE_DAYS",
+                                        "renewal_type":  "AUTO_RENEW",
+                                        "renewal_notice_period":  "P90D",
+                                        "renewal_notice_date":  "2028-01-01T00:00:00",
+                                        "auto_renewal_term_length":  "P1Y",
+                                        "termination_period_for_cause":  "P15D",
+                                        "termination_period_for_convenience":  "P60D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "f8267f9e-9efc-44cb-b33a-1da163d3c499",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.147282+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:32.289157+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/33bf9f5c-907f-4e89-bff0-61487173c807"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "b61750f5-aed5-45fd-a956-ef16970da8da",
+                     "title":  "Payroll Processing Services Agreement",
+                     "file_name":  "Payroll Services Agreement - GardenState Payroll.docx",
+                     "document_id":  "33bf9f5c-907f-4e89-bff0-61487173c807",
+                     "type":  "ServicesAgreement",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "d75e6c32-824a-4613-beb3-fb584bae03f0",
+                                         "name_in_agreement":  "GardenState Payroll Solutions Inc."
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2025-01-01T00:00:00",
+                                        "expiration_date":  "2027-12-31T00:00:00",
+                                        "execution_date":  "2024-12-19T00:00:00",
+                                        "term_length":  "P3Y",
+                                        "governing_law":  "New Jersey",
+                                        "payment_terms_due_date":  "THIRTY_DAYS",
+                                        "renewal_type":  "FIXED_TERM",
+                                        "renewal_notice_date":  "2027-12-31T00:00:00",
+                                        "termination_period_for_cause":  "P15D",
+                                        "termination_period_for_convenience":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "33bf9f5c-907f-4e89-bff0-61487173c807",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.082561+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:33.727463+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/58020d68-803b-4b48-ac2b-b7d54c015dbd"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "5293af69-74e8-465a-8177-6e297ed2c015",
+                     "title":  "Marketing Services Agreement",
+                     "file_name":  "Marketing Services Agreement - Shoreline Creative.docx",
+                     "document_id":  "58020d68-803b-4b48-ac2b-b7d54c015dbd",
+                     "type":  "Marketing",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "efa95cda-c2c8-4ba5-919c-4846475898ba",
+                                         "name_in_agreement":  "Shoreline Creative Group LLC"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-12-15T00:00:00",
+                                        "expiration_date":  "2027-12-14T00:00:00",
+                                        "execution_date":  "2026-11-20T00:00:00",
+                                        "term_length":  "P1Y",
+                                        "governing_law":  "Laws of the State of New Jersey",
+                                        "payment_terms_due_date":  "THIRTY_DAYS",
+                                        "renewal_type":  "AUTO_RENEW",
+                                        "renewal_notice_period":  "P45D",
+                                        "renewal_notice_date":  "2027-10-30T00:00:00",
+                                        "auto_renewal_term_length":  "P1Y",
+                                        "termination_period_for_convenience":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "58020d68-803b-4b48-ac2b-b7d54c015dbd",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.071592+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:32.172157+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/355d8d82-7bff-4ecf-bc47-72f6b99721bb"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "fa663bf7-e8ac-4d23-883c-226e4f257437",
+                     "title":  "Enterprise Software License Agreement",
+                     "file_name":  "Software License Agreement - MapWorks GIS.docx",
+                     "document_id":  "355d8d82-7bff-4ecf-bc47-72f6b99721bb",
+                     "type":  "License",
+                     "category":  "Miscellaneous",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "bc0513a6-d31d-46e9-af54-2e3a8659d771",
+                                         "name_in_agreement":  "MapWorks GIS Corporation"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-01-01T00:00:00",
+                                        "expiration_date":  "2028-12-31T00:00:00",
+                                        "execution_date":  "2025-12-10T00:00:00",
+                                        "term_length":  "P3Y",
+                                        "assignment_type":  "NO_OR_CONSENT_REQUIRED",
+                                        "assignment_change_of_control":  "YES_WITH_CONDITIONS",
+                                        "governing_law":  "New Jersey",
+                                        "payment_terms_due_date":  "THIRTY_DAYS",
+                                        "liability_cap_duration":  "P12M",
+                                        "renewal_type":  "AUTO_RENEW",
+                                        "renewal_notice_period":  "P60D",
+                                        "renewal_notice_date":  "2028-11-01T00:00:00",
+                                        "auto_renewal_term_length":  "P1Y"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "355d8d82-7bff-4ecf-bc47-72f6b99721bb",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.069595+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T14:32:32.047987+00:00",
+                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/97bc2897-d253-457d-b099-c03fdd754cbf"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "1b3eda1d-24e3-4d74-ab66-ccfd5fd476e1",
+                     "title":  "Consulting Agreement",
+                     "file_name":  "Consulting Agreement - Meridian Grant Advisors.docx",
+                     "document_id":  "97bc2897-d253-457d-b099-c03fdd754cbf",
+                     "type":  "Consulting",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "67382727-c580-4438-8941-84046dc79d39",
+                                         "name_in_agreement":  "Meridian Grant Advisors LLC"
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2025-09-15T00:00:00",
+                                        "expiration_date":  "2026-09-14T00:00:00",
+                                        "execution_date":  "2025-09-02T00:00:00",
+                                        "term_length":  "P1Y",
+                                        "governing_law":  "New York",
+                                        "payment_terms_due_date":  "THIRTY_DAYS",
+                                        "renewal_type":  "FIXED_TERM",
+                                        "renewal_notice_period":  "P60D",
+                                        "renewal_notice_date":  "2026-07-16T00:00:00",
+                                        "termination_period_for_convenience":  "P30D"
+                                    },
+                     "custom_provisions":  {
+
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "97bc2897-d253-457d-b099-c03fdd754cbf",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
+                                      "created_at":  "2026-11-27T14:31:43.063389+00:00",
+                                      "created_by":  "s2s:admi/admi-iam-transforms",
+                                      "modified_at":  "2026-11-27T16:34:55.968074+00:00",
+                                      "modified_by":  "user:cf96d189-91dc-4986-9eb2-1b4c7ef39b5d"
+                                  },
+                     "_links":  {
+                                    "document":  {
+                                                     "href":  "https://s1.us.services.demo.docusign.net/document-public-dms/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/documents/aed619ca-6179-4fd5-9edc-cd648d35e2bf"
+                                                 },
+                                    "agreement_types":  {
+                                                            "href":  "/v1/accounts/5a68f9e7-dc32-45af-8a75-f5e863cba6a6/agreement-types"
+                                                        }
+                                },
+                     "id":  "20df24fb-adab-46a1-8286-40aae2adf774",
+                     "title":  "Software-As-A-Service Subscription Agreement",
+                     "file_name":  "SaaS Subscription Agreement - CloudLedger Financials.docx",
+                     "document_id":  "aed619ca-6179-4fd5-9edc-cd648d35e2bf",
+                     "type":  "Subscription",
+                     "category":  "BusinessServices",
+                     "status":  "COMPLETE",
+                     "review_status":  "PENDING",
+                     "parties":  [
+                                     {
+                                         "id":  "46f9a1c2-93a7-41c9-abd9-60d97bd6111b",
+                                         "name_in_agreement":  "New Jersey Economic Development Authority"
+                                     },
+                                     {
+                                         "id":  "9de584fa-c716-4a43-a843-c5ec93514c80",
+                                         "name_in_agreement":  "CloudLedger Financials Inc."
+                                     }
+                                 ],
+                     "provisions":  {
+                                        "effective_date":  "2026-02-01T00:00:00",
+                                        "expiration_date":  "2027-01-31T00:00:00",
+                                        "execution_date":  "2026-01-22T00:00:00",
+                                        "term_length":  "P1Y",
+                                        "governing_law":  "Delaware",
+                                        "payment_terms_due_date":  "FIFTEEN_DAYS",
+                                        "can_charge_late_payment_fees":  true,
+                                        "late_payment_fee_percent":  1.5,
+                                        "liability_cap_duration":  "P12M",
+                                        "price_cap_percent_increase":  7,
+                                        "renewal_type":  "AUTO_RENEW",
+                                        "renewal_notice_period":  "P30D",
+                                        "renewal_notice_date":  "2027-01-01T00:00:00",
+                                        "auto_renewal_term_length":  "P1Y",
+                                        "termination_period_for_cause":  "P30D"
+                                    },
+                     "custom_provisions":  {
+                                               "c_RiskLevel_pfcXAX":  "medium",
+                                               "c_Department_cOtkJt":  "finance"
+                                           },
+                     "languages":  [
+                                       "en"
+                                   ],
+                     "source_name":  "UploadCenter",
+                     "source_id":  "aed619ca-6179-4fd5-9edc-cd648d35e2bf",
+                     "source_account_id":  "5a68f9e7-dc32-45af-8a75-f5e863cba6a6",
+                     "agreement_set_ids":  [
+                                               "WQW-qUNoQBju9XeupPRXH"
+                                           ]
+                 },
+                 {
+                     "metadata":  {
                                       "created_at":  "2026-11-27T03:46:59.574023+00:00",
                                       "created_by":  "s2s:admi/admi-iam-transforms",
-                                      "modified_at":  "2026-11-27T03:47:17.021069+00:00",
-                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                      "modified_at":  "2026-11-27T16:35:24.995638+00:00",
+                                      "modified_by":  "user:cf96d189-91dc-4986-9eb2-1b4c7ef39b5d"
                                   },
                      "_links":  {
                                     "document":  {
@@ -61,7 +774,8 @@
                                         "termination_period_for_convenience":  "P30D"
                                     },
                      "custom_provisions":  {
-
+                                               "c_RiskLevel_pfcXAX":  "low",
+                                               "c_Department_cOtkJt":  "legal"
                                            },
                      "languages":  [
                                        "en"
@@ -77,8 +791,8 @@
                      "metadata":  {
                                       "created_at":  "2026-11-27T03:46:59.573335+00:00",
                                       "created_by":  "s2s:admi/admi-iam-transforms",
-                                      "modified_at":  "2026-11-27T03:48:15.493053+00:00",
-                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                      "modified_at":  "2026-11-27T16:34:25.579679+00:00",
+                                      "modified_by":  "user:cf96d189-91dc-4986-9eb2-1b4c7ef39b5d"
                                   },
                      "_links":  {
                                     "document":  {
@@ -128,7 +842,8 @@
                                         "termination_period_for_convenience":  "P45D"
                                     },
                      "custom_provisions":  {
-
+                                               "c_RiskLevel_pfcXAX":  "low",
+                                               "c_Department_cOtkJt":  "analytics"
                                            },
                      "languages":  [
                                        "en"
@@ -144,8 +859,8 @@
                      "metadata":  {
                                       "created_at":  "2026-11-27T03:46:59.566757+00:00",
                                       "created_by":  "s2s:admi/admi-iam-transforms",
-                                      "modified_at":  "2026-11-27T03:47:55.185049+00:00",
-                                      "modified_by":  "s2s:admi/admi-iam-transforms"
+                                      "modified_at":  "2026-11-27T16:33:47.830102+00:00",
+                                      "modified_by":  "user:cf96d189-91dc-4986-9eb2-1b4c7ef39b5d"
                                   },
                      "_links":  {
                                     "document":  {
@@ -194,7 +909,9 @@
                                         "termination_period_for_cause":  "P30D"
                                     },
                      "custom_provisions":  {
-
+                                               "c_RiskLevel_pfcXAX":  "medium",
+                                               "c_Department_cOtkJt":  "operations",
+                                               "c_LeaseDeposit_G75EQU":  17500
                                            },
                      "languages":  [
                                        "en"

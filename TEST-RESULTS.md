@@ -30,6 +30,16 @@ Notes from this run:
   connector's own Agreements code path has not yet been exercised against the live tenant (that is
   Phase 3 of the plan).
 
+### v1.3.1 — custom-field name cleaning (run date 2026-11-27)
+
+Navigator custom fields were defined live on the Demo account (Lease Deposit, Department,
+Risk Level) and values set on four agreements. The API returns them as generated keys
+(`c_<Name>_<6-char suffix>`, e.g. `c_LeaseDeposit_G75EQU`) with lowercased dropdown values.
+v1.3.1 adds `DocuSignPowerBI.CleanCustomFieldName` (recovers the display name) and a `FieldKey`
+column carrying the raw key on the `CustomField` table. Fixtures updated to the generated-key
+shape (`test/mocks/navigator-agreements-list.json` recaptured live: 16 agreements, 4 with
+populated `custom_provisions`). Suites re-run: **unit 130/130, integration 60/60 — 190/190.**
+
 ### AgreementsReport `.pbip` / `.pbit` verification (2026-11-27)
 
 The new `powerbi-report/AgreementsReport.pbip` was opened in Power BI Desktop on a real machine:

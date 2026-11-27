@@ -1,0 +1,87 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "c3e60302",
+  "position": {
+    "x": 260,
+    "y": 150,
+    "z": 0,
+    "height": 550,
+    "width": 1000,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Agreements"
+                    }
+                  },
+                  "Property": "Title"
+                }
+              },
+              "queryRef": "Agreements.Title",
+              "nativeQueryRef": "Title"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CustomField"
+                    }
+                  },
+                  "Property": "FieldName"
+                }
+              },
+              "queryRef": "CustomField.FieldName",
+              "nativeQueryRef": "FieldName"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "CustomField"
+                    }
+                  },
+                  "Property": "FieldValue"
+                }
+              },
+              "queryRef": "CustomField.FieldValue",
+              "nativeQueryRef": "FieldValue"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Custom Field Values by Agreement'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

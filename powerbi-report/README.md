@@ -106,7 +106,7 @@ Parameters `Environment` (`Demo`/`Production`) and `AccountId` — same pattern 
 |---|---|---|
 | Agreements | connector `Agreements` | all 67 connector columns, 14 measures |
 | Parties | connector `Parties` | `Total Parties` measure |
-| CustomField | connector `CustomField` | empty unless Navigator custom fields are defined |
+| CustomField | connector `CustomField` | populated once Navigator custom fields are defined and filled (live since 2026-11-27: Lease Deposit, Department, Risk Level); `FieldName` is the cleaned display name, `FieldKey` the raw generated `c_*` key, plus a `Custom Field Entries` measure |
 | Date | M-generated calendar (2010 → today+10y) | **disconnected** — used via `MIN`/`MAX` filter context in measures, matching the official template's pattern |
 | Agreement Status Breakdown | static 3-row M table | drives the status donut via `Dynamic Status Count` |
 
@@ -120,6 +120,7 @@ Measures (ported from the official template, all `COALESCE`-wrapped; `Fiscal_*`,
 |---|---|
 | Agreements Overview | 5 KPI cards (total / active / expiring 90d / renewal due 90d / total value), status-breakdown donut, Agreements by Type, Agreements by Party (via the Parties relationship), agreement detail table |
 | Renewals & Deadlines | RenewalType slicer, 4 cards (renewing soon / expiring non-renewing / pending renewal / expired), Expirations by Year, Agreements by Governing Law, renewal-pipeline table (notice dates, termination deadlines) |
+| Custom Fields | FieldName slicer, Custom Field Entries card, custom-field values table (agreement title / field / value via the CustomField relationship) |
 
 ### Opening it
 

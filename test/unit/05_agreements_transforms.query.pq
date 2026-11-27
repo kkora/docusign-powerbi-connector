@@ -41,7 +41,7 @@ msaRaw = [
         total_agreement_value = 240000,
         total_agreement_value_currency_code = "USD"
     ],
-    custom_provisions = [ department = "Legal", lease_deposit = 17500 ],
+    custom_provisions = [ c_Department_cOtkJt = "legal", c_LeaseDeposit_G75EQU = 17500 ],
     languages = {"en"},
     source_name = "UploadCenter"
 ];
@@ -93,7 +93,7 @@ future = Table.SelectRows(agreements, each [Id] = "ag-future-4"){0};
 
 partiesRows = DocuSignPowerBI.FlattenAgreementParties({msaRaw, ndaRaw, formRaw}, "ACCT-1");
 customFieldRows = DocuSignPowerBI.FlattenAgreementCustomFields({msaRaw, ndaRaw, formRaw}, "ACCT-1");
-depositRow = List.First(List.Select(customFieldRows, each [FieldName] = "lease_deposit"));
+depositRow = List.First(List.Select(customFieldRows, each [FieldName] = "LeaseDeposit"));
 
 shared DocuSignPowerBI.Test.Agreements = PQTest(
     [Owner = "automation", Traits = [Category = "Unit-Agreements"]],
@@ -144,5 +144,13 @@ shared DocuSignPowerBI.Test.Agreements = PQTest(
         // Custom provisions unpivot.
         Fact("custom_provisions unpivots to one row per field", 2, List.Count(customFieldRows)),
         Fact("Non-text custom values are stringified", {"ag-msa-1", "17500"}, {depositRow[AgreementId], depositRow[FieldValue]}),
-        Fact("Empty custom_provisions yield no rows", 0, List.Count(List.Select(customFieldRows, each [AgreementId] = "ag-nda-2")))
+        Fact("The raw generated key is preserved alongside the cleaned name", "c_LeaseDeposit_G75EQU", depositRow[FieldKey]),
+        Fact("Empty custom_provisions yield no rows", 0, List.Count(List.Select(customFieldRows, each [AgreementId] = "ag-nda-2"))),
+
+        // CleanCustomFieldName: Navigator's generated "c_<Name>_<6-char suffix>" keys.
+        Fact("Generated key cleans to the display name", "RiskLevel", DocuSignPowerBI.CleanCustomFieldName("c_RiskLevel_pfcXAX")),
+        Fact("c_ prefix without a generated suffix is still stripped", "Description", DocuSignPowerBI.CleanCustomFieldName("c_Description")),
+        Fact("A non-6-char tail is not treated as a suffix", "Custom_Pay", DocuSignPowerBI.CleanCustomFieldName("c_Custom_Pay")),
+        Fact("Keys without the c_ prefix pass through unchanged", "lease_deposit", DocuSignPowerBI.CleanCustomFieldName("lease_deposit")),
+        Fact("Null keys stay null", null, DocuSignPowerBI.CleanCustomFieldName(null))
     });

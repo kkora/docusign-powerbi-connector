@@ -36,5 +36,5 @@ shared DocuSignPowerBI.Test.Integration.Agreements = PQTest(
 
         // CustomField table.
         Fact("custom_provisions unpivot to one row per field", 2, Table.RowCount(customFields)),
-        Fact("Numeric custom values are stringified", "17500", Table.SelectRows(customFields, each [FieldName] = "lease_deposit"){0}[FieldValue])
+        Fact("Generated keys are cleaned to display names, raw key preserved", {"c_LeaseDeposit_G75EQU", "17500"}, (let r = Table.SelectRows(customFields, each [FieldName] = "LeaseDeposit"){0} in {r[FieldKey], r[FieldValue]}))
     });

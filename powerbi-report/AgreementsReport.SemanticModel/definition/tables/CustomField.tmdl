@@ -1,6 +1,10 @@
 table CustomField
 	lineageTag: c81a1426-9e9f-408c-be05-85fb499d864f
 
+	measure 'Custom Field Entries' = COALESCE(COUNTROWS(CustomField), 0)
+		formatString: #,0
+		lineageTag: 3f8e2b61-9a4d-4c0e-8d27-5b1c6f0a9e42
+
 	column AccountId
 		dataType: string
 		lineageTag: c8e80225-3071-4554-92fe-66d96a369e8d
@@ -14,6 +18,14 @@ table CustomField
 		lineageTag: a67c1069-810b-408a-85b9-1eed8d9adecd
 		summarizeBy: none
 		sourceColumn: AgreementId
+
+		annotation SummarizationSetBy = Automatic
+
+	column FieldKey
+		dataType: string
+		lineageTag: 8d15c7a9-2e6f-4b38-9c01-74da5e8b3f60
+		summarizeBy: none
+		sourceColumn: FieldKey
 
 		annotation SummarizationSetBy = Automatic
 

@@ -1,4 +1,4 @@
-[Version = "1.3.0"]
+[Version = "1.3.1"]
 section DocuSignPowerBI;
 
 // DocuSign Integration Key for a public-client Authorization Code + PKCE application. Preserve this value.
@@ -109,8 +109,10 @@ AgreementPartiesRowType = type table [
     AccountId = nullable text, AgreementId = nullable text, PartyId = nullable text, PartyName = nullable text
 ];
 
+// FieldKey carries DocuSign's raw generated key (e.g. "c_LeaseDeposit_G75EQU"); FieldName is the
+// cleaned display name ("LeaseDeposit") - see CleanCustomFieldName.
 AgreementCustomFieldsRowType = type table [
-    AccountId = nullable text, AgreementId = nullable text, FieldName = nullable text, FieldValue = nullable text
+    AccountId = nullable text, AgreementId = nullable text, FieldKey = nullable text, FieldName = nullable text, FieldValue = nullable text
 ];
 
 RecipientBuckets = {"signers", "agents", "editors", "intermediaries", "carbonCopies", "certifiedDeliveries", "inPersonSigners", "seals", "witnesses", "notaries"};
@@ -910,6 +912,21 @@ shared DocuSignPowerBI.FlattenAgreementParties = (rawAgreements as list, account
 shared DocuSignPowerBI.BuildAgreementPartiesTable = (rawAgreements as list, accountId as nullable text) as table =>
     Table.FromRecords(DocuSignPowerBI.FlattenAgreementParties(rawAgreements, accountId), AgreementPartiesRowType, MissingField.UseNull);
 
+// Navigator names each custom field with a generated key: "c_" + display name (spaces removed)
+// + "_" + a 6-character random suffix, e.g. "c_LeaseDeposit_G75EQU" (live-observed 2026-11-27).
+// This recovers the display name; keys not matching that pattern pass through unchanged.
+shared DocuSignPowerBI.CleanCustomFieldName = (key as nullable text) as nullable text =>
+    if key = null or not Text.StartsWith(key, "c_") then key
+    else
+        let
+            trimmed = Text.Range(key, 2),
+            lastUnderscore = Text.PositionOf(trimmed, "_", Occurrence.Last),
+            suffix = if lastUnderscore < 0 then "" else Text.Range(trimmed, lastUnderscore + 1),
+            isGeneratedSuffix = Text.Length(suffix) = 6 and
+                List.AllTrue(List.Transform(Text.ToList(suffix), each
+                    (_ >= "0" and _ <= "9") or (_ >= "A" and _ <= "Z") or (_ >= "a" and _ <= "z")))
+        in if isGeneratedSuffix then Text.Start(trimmed, lastUnderscore) else trimmed;
+
 // Pure transform: unpivots each agreement's custom_provisions record into one row per field.
 // Values are stringified (custom provisions are free-typed); empty/missing records yield no rows.
 shared DocuSignPowerBI.FlattenAgreementCustomFields = (rawAgreements as list, accountId as nullable text) as list =>
@@ -917,12 +934,13 @@ shared DocuSignPowerBI.FlattenAgreementCustomFields = (rawAgreements as list, ac
         let
             cpRaw = Record.FieldOrDefault(a, "custom_provisions", null),
             cp = if cpRaw = null then [] else cpRaw
-        in List.Transform(Record.FieldNames(cp), (fieldName) =>
-            let v = Record.Field(cp, fieldName)
+        in List.Transform(Record.FieldNames(cp), (fieldKey) =>
+            let v = Record.Field(cp, fieldKey)
             in [
                 AccountId = accountId,
                 AgreementId = Record.FieldOrDefault(a, "id", null),
-                FieldName = fieldName,
+                FieldKey = fieldKey,
+                FieldName = DocuSignPowerBI.CleanCustomFieldName(fieldKey),
                 FieldValue = if v = null then null else (try Text.From(v) otherwise null)
             ])));
 
