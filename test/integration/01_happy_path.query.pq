@@ -1,7 +1,7 @@
 [Version = "1.0.0"]
 section DocuSignPowerBI.Test.Integration.Happy;
 
-nav = DocuSignPowerBI.Contents("Demo", "2024-01-01");
+nav = DocuSignPowerBI.ContentsWithDates("Demo", "2024-01-01");
 envelopes = Table.SelectRows(nav, each [Name] = "Envelopes"){0}[Data];
 recipients = Table.SelectRows(nav, each [Name] = "Recipients"){0}[Data];
 statuses = Table.SelectRows(nav, each [Name] = "Envelope Status"){0}[Data];

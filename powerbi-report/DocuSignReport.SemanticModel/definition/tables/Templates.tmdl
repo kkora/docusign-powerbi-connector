@@ -88,7 +88,7 @@ table Templates
 		mode: import
 		source =
 				let
-				    Source = DocuSignPowerBI.Contents(Environment, null, null, AccountId),
+				    Source = DocuSignPowerBI.Contents(Environment, AccountId),
 				    Data = Source{[Name="Templates"]}[Data]
 				in
 				    Data

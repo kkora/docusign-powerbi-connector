@@ -42,7 +42,7 @@ table Accounts
 		mode: import
 		source =
 				let
-				    Source = DocuSignPowerBI.Contents(Environment, null, null, AccountId),
+				    Source = DocuSignPowerBI.Contents(Environment, AccountId),
 				    Data = Source{[Name="Accounts"]}[Data]
 				in
 				    Data

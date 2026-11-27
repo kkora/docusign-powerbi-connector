@@ -1,12 +1,12 @@
 [Version = "1.0.0"]
 section DocuSignPowerBI.Test.Integration.EmptyAndDuplicates;
 
-navEmpty = DocuSignPowerBI.Contents("Demo", "2024-03-01");
+navEmpty = DocuSignPowerBI.ContentsWithDates("Demo", "2024-03-01");
 envelopesEmpty = Table.SelectRows(navEmpty, each [Name] = "Envelopes"){0}[Data];
 recipientsEmpty = Table.SelectRows(navEmpty, each [Name] = "Recipients"){0}[Data];
 statusEmpty = Table.SelectRows(navEmpty, each [Name] = "Envelope Status"){0}[Data];
 
-navDup = DocuSignPowerBI.Contents("Demo", "2024-04-01");
+navDup = DocuSignPowerBI.ContentsWithDates("Demo", "2024-04-01");
 envelopesDup = Table.SelectRows(navDup, each [Name] = "Envelopes"){0}[Data];
 
 shared DocuSignPowerBI.Test.Integration.EmptyAndDuplicates = PQTest(

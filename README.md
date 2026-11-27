@@ -6,14 +6,14 @@ Build and automated-test status: see [TEST-RESULTS.md](TEST-RESULTS.md). 138/138
 
 ## Connecting
 
-`DocuSignPowerBI.Contents(environment, optional fromDate, optional toDate, optional accountId)`:
+`DocuSignPowerBI.Contents(environment, optional accountId)`:
 
 - `environment` (required): `"Demo"` or `"Production"`.
-- `fromDate` (optional, `YYYY-MM-DD`): defaults to 30 days before today if omitted.
-- `toDate` (optional, `YYYY-MM-DD`): defaults to no upper bound (through now) if omitted. Must not be before `fromDate`.
 - `accountId` (optional): selects a specific DocuSign account when your login has access to more than one. Omit to use your default account. See the **Accounts** table to find available account ids.
 
-All three optional parameters are excluded from the connector's Data Source Path, so changing them does not create a new credential entry or break scheduled refresh (see PBI-06 in TEST-RESULTS.md).
+Envelope retrieval covers the last 30 days through now. The unpublished `DocuSignPowerBI.ContentsWithDates(environment, optional fromDate, optional toDate, optional accountId)` variant retains explicit `YYYY-MM-DD` date-range control (used by the integration test suite; also callable from hand-written M).
+
+The optional parameters are excluded from the connector's Data Source Path, so changing them does not create a new credential entry or break scheduled refresh (see PBI-06 in TEST-RESULTS.md).
 
 ## Prerequisites
 
@@ -74,7 +74,7 @@ PQTest.exe run-test -e bin\AnyCPU\Debug\DocuSignPowerBI.mez -q test\integration\
 
 3. In Power BI Desktop: **File → Options and settings → Options → Security → Data Extensions** → select **"Allow any extension to load without validation or warning"** (required for an unsigned connector in development).
 4. Restart Power BI Desktop.
-5. **Get Data → More... → Online Services → DocuSign eSignature**, then enter `Demo` (and optionally `fromDate`/`toDate`/`accountId` — see "Connecting" above).
+5. **Get Data → More... → Online Services → DocuSign eSignature**, then enter `Demo` (and optionally `accountId` — see "Connecting" above).
 6. Sign in with a DocuSign Demo account when prompted (OAuth browser dialog).
 7. In Navigator, select any of the eight tables (**Envelopes**, **Recipients**, **Envelope Status**, **Envelope Custom Fields**, **Envelope Audit Events**, **Templates**, **Envelope Documents**, **Accounts**) and load. Only the tables you actually select trigger their corresponding API calls (Navigator data is lazy).
 

@@ -1,7 +1,7 @@
 [Version = "1.0.0"]
 section DocuSignPowerBI.Test.Integration.Pagination;
 
-nav = DocuSignPowerBI.Contents("Demo", "2024-02-01");
+nav = DocuSignPowerBI.ContentsWithDates("Demo", "2024-02-01");
 envelopes = Table.SelectRows(nav, each [Name] = "Envelopes"){0}[Data];
 ids = List.Sort(Table.Column(envelopes, "EnvelopeId"));
 

@@ -94,7 +94,7 @@ table 'Envelope Audit Events'
 		mode: import
 		source =
 				let
-				    Source = DocuSignPowerBI.Contents(Environment, null, null, AccountId),
+				    Source = DocuSignPowerBI.Contents(Environment, AccountId),
 				    Data = Source{[Name="Envelope Audit Events"]}[Data]
 				in
 				    Data

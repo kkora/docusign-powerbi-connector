@@ -5,7 +5,7 @@ section DocuSignPowerBI.Test.Integration.Errors;
 // Envelopes table) inside the try - otherwise the try would see a "successful" Navigator shell
 // without ever issuing the underlying HTTP request.
 ForceEnvelopes = (fromDate as text) as number =>
-    Table.RowCount(Table.SelectRows(DocuSignPowerBI.Contents("Demo", fromDate), each [Name] = "Envelopes"){0}[Data]);
+    Table.RowCount(Table.SelectRows(DocuSignPowerBI.ContentsWithDates("Demo", fromDate), each [Name] = "Envelopes"){0}[Data]);
 
 invalidJsonResult = try ForceEnvelopes("2024-05-01");
 forbiddenResult = try ForceEnvelopes("2024-06-01");

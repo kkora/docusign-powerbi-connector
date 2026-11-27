@@ -2,18 +2,18 @@
 section DocuSignPowerBI.Test.Integration.MultiAccount;
 
 // F05: default account selection (no accountId given) still resolves to ACCT-1 as before.
-navDefault = DocuSignPowerBI.Contents("Demo", "2024-10-01");
+navDefault = DocuSignPowerBI.ContentsWithDates("Demo", "2024-10-01");
 accountsDefault = Table.SelectRows(navDefault, each [Name] = "Accounts"){0}[Data];
 
 // F05: explicit account selection pulls data from the OTHER account, not the default.
-navExplicit = DocuSignPowerBI.Contents("Demo", "2024-10-01", null, "ACCT-2");
+navExplicit = DocuSignPowerBI.ContentsWithDates("Demo", "2024-10-01", null, "ACCT-2");
 envelopesExplicit = Table.SelectRows(navExplicit, each [Name] = "Envelopes"){0}[Data];
 
 // F05: an accountId the user doesn't have access to must fail clearly, before any data call.
-unauthorizedAccountResult = try Table.RowCount(Table.SelectRows(DocuSignPowerBI.Contents("Demo", "2024-10-01", null, "ACCT-DOES-NOT-EXIST"), each [Name] = "Envelopes"){0}[Data]);
+unauthorizedAccountResult = try Table.RowCount(Table.SelectRows(DocuSignPowerBI.ContentsWithDates("Demo", "2024-10-01", null, "ACCT-DOES-NOT-EXIST"), each [Name] = "Envelopes"){0}[Data]);
 
 // F02: fromDate after toDate must be rejected before any HTTP call.
-invalidRangeResult = try Table.RowCount(Table.SelectRows(DocuSignPowerBI.Contents("Demo", "2024-05-01", "2024-01-01"), each [Name] = "Envelopes"){0}[Data]);
+invalidRangeResult = try Table.RowCount(Table.SelectRows(DocuSignPowerBI.ContentsWithDates("Demo", "2024-05-01", "2024-01-01"), each [Name] = "Envelopes"){0}[Data]);
 
 shared DocuSignPowerBI.Test.Integration.MultiAccount = PQTest(
     [Owner = "automation", Traits = [Category = "Integration-MultiAccount"]],

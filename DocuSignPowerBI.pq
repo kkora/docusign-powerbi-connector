@@ -187,10 +187,10 @@ DocuSignPowerBI.Icons = [
 
 // ===== Main entry point =====
 //
-// fromDate/toDate/accountId are all `optional`, so none of them factor into the Data Source Path
-// (only required parameters do) - the connection identity stays `{"environment": ...}` regardless
-// of which date range or account a report requests, which is what keeps credentials/gateway config
-// stable across different reports (F05/F10).
+// accountId is `optional`, so it does not factor into the Data Source Path (only required
+// parameters do) - the connection identity stays `{"environment": ...}` regardless of which
+// account a report requests, which is what keeps credentials/gateway config stable across
+// different reports (F05/F10).
 // Ascribed function type: gives the Get Data dialog a dropdown for environment
 // (defaulting to the first listed value, Demo) instead of a free-text box, which
 // is what let "demo"/lowercase typos slip through repeatedly during live testing.
@@ -199,16 +199,6 @@ DocuSignPowerBIType = type function (
         Documentation.FieldCaption = "Environment",
         Documentation.FieldDescription = "DocuSign environment to connect to.",
         Documentation.AllowedValues = {"Demo", "Production"}
-    ]),
-    optional fromDate as (type nullable text meta [
-        Documentation.FieldCaption = "From Date",
-        Documentation.FieldDescription = "Start date for envelope retrieval, YYYY-MM-DD. Defaults to 30 days ago if left blank.",
-        Documentation.SampleValues = {"2024-01-01"}
-    ]),
-    optional toDate as (type nullable text meta [
-        Documentation.FieldCaption = "To Date",
-        Documentation.FieldDescription = "End date for envelope retrieval, YYYY-MM-DD. Defaults to now if left blank.",
-        Documentation.SampleValues = {"2024-12-31"}
     ]),
     optional accountId as (type nullable text meta [
         Documentation.FieldCaption = "Account ID",
@@ -221,7 +211,18 @@ DocuSignPowerBIType = type function (
 ];
 
 [DataSource.Kind = "DocuSignPowerBI", Publish = "DocuSignPowerBI.Publish"]
-shared DocuSignPowerBI.Contents = Value.ReplaceType(DocuSignPowerBIImpl, DocuSignPowerBIType);
+shared DocuSignPowerBI.Contents = Value.ReplaceType(
+    (environment as text, optional accountId as nullable text) as table =>
+        DocuSignPowerBIImpl(environment, null, null, accountId),
+    DocuSignPowerBIType);
+
+// Unpublished variant that keeps the fromDate/toDate knobs. No Publish attribute, so it never
+// appears in Get Data, but it carries the same DataSource.Kind (same credentials, and since the
+// dates are optional the Data Source Path is still just `{"environment": ...}`). The integration
+// test suite depends on it: the recorded HTTP mocks are keyed on the from_date query parameter,
+// so tests steer fixture selection by passing explicit dates.
+[DataSource.Kind = "DocuSignPowerBI"]
+shared DocuSignPowerBI.ContentsWithDates = DocuSignPowerBIImpl;
 
 DocuSignPowerBIImpl = (environment as text, optional fromDate as nullable text, optional toDate as nullable text, optional accountId as nullable text) as table =>
     let

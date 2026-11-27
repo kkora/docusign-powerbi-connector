@@ -157,7 +157,7 @@ table Recipients
 		mode: import
 		source =
 				let
-				    Source = DocuSignPowerBI.Contents(Environment, null, null, AccountId),
+				    Source = DocuSignPowerBI.Contents(Environment, AccountId),
 				    Data = Source{[Name="Recipients"]}[Data]
 				in
 				    Data

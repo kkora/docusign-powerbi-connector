@@ -1,7 +1,7 @@
 [Version = "1.0.0"]
 section DocuSignPowerBI.Test.Integration.NewTables;
 
-nav = DocuSignPowerBI.Contents("Demo", "2024-10-01");
+nav = DocuSignPowerBI.ContentsWithDates("Demo", "2024-10-01");
 customFields = Table.SelectRows(nav, each [Name] = "Envelope Custom Fields"){0}[Data];
 auditEvents = Table.SelectRows(nav, each [Name] = "Envelope Audit Events"){0}[Data];
 templates = Table.SelectRows(nav, each [Name] = "Templates"){0}[Data];
