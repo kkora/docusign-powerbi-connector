@@ -2,29 +2,30 @@
 
 ## package-distribution.ps1
 
-Builds and packages everything an end user needs to run the report, into `dist\`:
-`DocuSignPowerBI.mez` (the connector), `DocuSignReport.pbit` (the parameterized report
-template), and a generated `INSTALL.md` with end-user setup steps.
+Builds and packages everything an end user needs to run the reports, into `dist\`:
+`DocuSignPowerBI.mez` (the connector), **both** parameterized report templates
+(`DocuSignReport.pbit` and `AgreementsReport.pbit`), and a generated `INSTALL.md`
+with end-user setup steps.
 
 ### What it does
 
 1. **Build** — compiles the connector via `dotnet msbuild DocuSignPowerBI.proj -t:BuildMez`.
 2. **Deploy** — copies the fresh `.mez` into this machine's `Documents\Power BI Desktop\Custom Connectors` folder (skip with `-SkipDeploy`). Restart Power BI Desktop afterwards to load it.
-3. **Verify template** — checks that `powerbi-report\Templates\DocuSignReport.pbit` exists, warns if it's older than any report/model source file, and inspects the zip's `DataModelSchema` to confirm it contains the parameterized `DocuSignPowerBI.Contents(Environment, AccountId)` call and the `Environment`/`AccountId` parameters — catching a stale export before it ships.
-4. **Package** — assembles `dist\` with the `.mez`, `.pbit`, and `INSTALL.md`.
+3. **Verify templates** — for each of `powerbi-report\Templates\DocuSignReport.pbit` and `powerbi-report\Templates\AgreementsReport.pbit`: checks the file exists, warns if it's older than any file in its own report/model source folders, and inspects the zip's `DataModelSchema` to confirm it contains the parameterized `DocuSignPowerBI.Contents(Environment, AccountId)` call and the `Environment`/`AccountId` parameters — catching a stale export before it ships. A missing template fails the run with export instructions.
+4. **Package** — assembles `dist\` with the `.mez`, both `.pbit` files, and `INSTALL.md` (which documents the Navigator provisioning requirement and the clear-credential step for upgraders).
 
-### The one manual step
+### The one manual step (per template)
 
 Power BI Desktop is the only tool that can export a `.pbit` (there is no CLI for it).
 After any report or model change:
 
-1. Open `powerbi-report\DocuSignReport.pbip` in Power BI Desktop.
+1. Open `powerbi-report\DocuSignReport.pbip` (or `AgreementsReport.pbip`) in Power BI Desktop.
 2. **File → Export → Power BI template**.
-3. Save as `powerbi-report\Templates\DocuSignReport.pbit`.
+3. Save as `powerbi-report\Templates\<ProjectName>.pbit`.
 4. Re-run this script.
 
-The template stores no data and no credentials — on open it prompts for `Environment`
-and `AccountId`, then runs OAuth sign-in.
+The templates store no data and no credentials — on open they prompt for `Environment`
+and `AccountId`, then run OAuth sign-in.
 
 ### Usage and parameters
 
@@ -35,7 +36,6 @@ and `AccountId`, then runs OAuth sign-in.
 
 | Parameter | Required | Default | Description |
 | --- | --- | --- | --- |
-| `PbitPath` | No | `powerbi-report\Templates\DocuSignReport.pbit` | Location of the Desktop-exported template. |
 | `SkipDeploy` | No | off | Don't copy the `.mez` to the local Custom Connectors folder. |
 | `DistDir` | No | `dist` | Output folder for the distribution package. |
 
