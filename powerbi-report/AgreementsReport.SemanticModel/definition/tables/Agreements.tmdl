@@ -654,6 +654,7 @@ table Agreements
 
 	column EffectiveYearNumber
 		dataType: int64
+		formatString: 0
 		lineageTag: 09d6d21e-92f6-475c-b565-cf34c2868943
 		summarizeBy: none
 		sourceColumn: EffectiveYearNumber
@@ -662,6 +663,7 @@ table Agreements
 
 	column ExpirationYearNumber
 		dataType: int64
+		formatString: 0
 		lineageTag: 2a9f2580-dc2c-456e-af73-096f68e5c0ac
 		summarizeBy: none
 		sourceColumn: ExpirationYearNumber
@@ -670,6 +672,7 @@ table Agreements
 
 	column ExecutionYearNumber
 		dataType: int64
+		formatString: 0
 		lineageTag: be753937-486d-41a1-a068-6a05adea8da0
 		summarizeBy: none
 		sourceColumn: ExecutionYearNumber
@@ -678,6 +681,7 @@ table Agreements
 
 	column RenewalNoticeYearNumber
 		dataType: int64
+		formatString: 0
 		lineageTag: 70564823-88c0-4920-b45f-3e7ef10890a6
 		summarizeBy: none
 		sourceColumn: RenewalNoticeYearNumber
